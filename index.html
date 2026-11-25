@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Oral · Calibrer une caméra</title>
+<link rel="stylesheet" href="katex/katex.min.css">
 <style>
 @font-face{font-family:"EB Garamond";src:url("fonts/EBGaramond12-Regular.ttf") format("truetype");font-weight:400;font-style:normal;font-display:swap}
 @font-face{font-family:"EB Garamond";src:url("fonts/EBGaramond12-Italic.ttf") format("truetype");font-weight:400;font-style:italic;font-display:swap}
@@ -113,10 +114,15 @@ h1{
 .spec dt{color:var(--muted);font-weight:500}
 .spec dd{margin:0;font-variant-numeric:lining-nums tabular-nums}
 .formula{
-  font-family:"EB Garamond",serif;font-size:42px;text-align:center;
+  font-size:28px;text-align:center;
   background:#fffdf8;border:1px solid var(--line);border-radius:18px;
-  padding:18px 20px 14px;letter-spacing:.01em;font-variant-numeric:lining-nums;
+  padding:6px 16px 8px;
 }
+.formula .katex-display{margin:0.15em 0}
+.katex{font-size:1.02em}
+.banner .katex,.stat .katex,figcaption .katex,.card .katex,th .katex,td .katex{font-size:1em}
+.fig.band{height:auto;flex:0 0 auto}
+.fig.band img{height:auto;flex:none;width:100%;max-height:248px;object-fit:contain}
 .formula .sub{font-family:Cabin,sans-serif;display:flex;justify-content:center;gap:28px;margin-top:8px;font-size:16px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .step h2{font-family:"EB Garamond",serif;font-size:32px;font-weight:400;margin:0 0 6px;letter-spacing:0;text-transform:none;color:var(--ink)}
 .step .n{font-family:Cousine,monospace;font-size:13px;color:var(--teal);letter-spacing:.14em}
@@ -146,7 +152,7 @@ td.move{color:var(--copper);font-weight:700}
   display:block;font-family:"EB Garamond",serif;font-weight:400;font-size:48px;line-height:1;
   font-variant-numeric:lining-nums tabular-nums;letter-spacing:-.02em;
 }
-.stat span{display:block;margin-top:6px;color:var(--muted);font-size:16px;line-height:1.3}
+.stat > span{display:block;margin-top:6px;color:var(--muted);font-size:16px;line-height:1.3}
 .checks{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px}
 .checks div{display:flex;gap:12px;align-items:baseline;background:#fffdf8;border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:20px;line-height:1.3}
 .checks .mark{font-family:Cousine,monospace;color:var(--teal);font-weight:700;flex:none}
@@ -163,11 +169,13 @@ td.move{color:var(--copper);font-weight:700}
 .para b{font-family:"EB Garamond",serif;font-size:64px;font-weight:400;display:block;line-height:.9;font-variant-numeric:lining-nums}
 .para p{margin:8px 0 0;font-size:20px;line-height:1.35;color:var(--ink-soft)}
 .take{display:grid;grid-template-columns:72px 1fr;gap:8px 18px;align-items:start}
-.fig{margin:0;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;min-height:0;height:100%}
-.fig img{width:100%;flex:1;height:0;min-height:0;object-fit:contain;background:#fff;display:block}
+.fig{margin:0;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+.fig img{width:100%;height:auto;max-height:340px;object-fit:contain;object-position:center;background:#fff;display:block}
+.pair .fig img{max-height:210px}
+.pose .fig img{max-height:430px}
 .fig figcaption{flex:none;font-size:16px;line-height:1.3;color:var(--ink-soft);padding:8px 12px 10px}
 .split{display:grid;grid-template-columns:1.2fr .9fr;gap:16px;min-height:0;flex:1;align-items:stretch}
-.pair,.pose{display:grid;gap:14px;min-height:0;flex:1;align-items:stretch}
+.pair,.pose{display:grid;gap:14px;min-height:0;flex:1;align-items:start}
 .pair{grid-template-columns:1fr 1fr}
 .pose{grid-template-columns:1.15fr .85fr}
 table.compact{font-size:20px}
@@ -310,7 +318,7 @@ body.show-notes #notes{display:flex;flex-direction:column}
               <dt>Capteur</dt><dd>Sony IMX183 · photosite 2,4 µm</dd>
               <dt>Objectif</dt><dd>Computar 8 mm</dd>
               <dt>Travail</dt><dd>2 736 × 1 824 · pixel 4,80 µm</dd>
-              <dt>K théorique</dt><dd>f<sub>x</sub> = f<sub>y</sub> = 1 667 px · centre (1 368, 912)</dd>
+              <dt>\(K\) théorique</dt><dd>\(f_x=f_y=1667\,\mathrm{px}\), centre \((1368,\,912)\)</dd>
               <dt>Mire</dt><dd>29 vues · 8 × 6 coins · case 40 mm</dd>
               <dt>Bâche</dt><dd>~1,25 m · 13 × 19 cercles · pas 100 mm</dd>
               <dt>Contrôle</dt><dd>63 repères manuels · pas 200 mm</dd>
@@ -330,8 +338,8 @@ body.show-notes #notes{display:flex;flex-direction:column}
       <h1>Trois étapes, une matrice</h1>
       <div class="content">
         <div class="formula">
-          s (u, v, 1)<sup>T</sup> = K [ R | t ] (X, Y, Z, 1)<sup>T</sup>
-          <div class="sub"><span>monde → caméra → plan normalisé → pixels</span><span>K · intrinsèques</span><span>s = Z<sub>c</sub></span></div>
+          \[ s\begin{pmatrix}u\\v\\1\end{pmatrix}=K\,[R\mid t]\begin{pmatrix}X\\Y\\Z\\1\end{pmatrix} \]
+          <div class="sub"><span>monde, caméra, plan normalisé, pixels</span><span>\(s=Z_c\)</span></div>
         </div>
         <div class="cols g3">
           <div class="card step">
@@ -342,12 +350,12 @@ body.show-notes #notes{display:flex;flex-direction:column}
           <div class="card step">
             <div class="n">02 · PERSPECTIVE</div>
             <h2>Diviser par Z<sub>c</sub></h2>
-            <p>x = X<sub>c</sub> / Z<sub>c</sub>. Seule étape non linéaire. Tout un rayon donne le même pixel : une image ne contient pas la profondeur.</p>
+            <p>\(x=X_c/Z_c\). Seule étape non linéaire. Tout un rayon donne le même pixel : une image ne contient pas la profondeur.</p>
           </div>
           <div class="card step">
             <div class="n">03 · INTRINSÈQUES</div>
             <h2>Plan → pixels</h2>
-            <p>u = f<sub>x</sub> x + c<sub>x</sub>. La distorsion de Brown-Conrady s’insère juste avant, dans le plan normalisé. Neuf intrinsèques en tout.</p>
+            <p>\(u=f_x x+c_x\). La distorsion de Brown–Conrady s’insère juste avant. Neuf intrinsèques en tout.</p>
           </div>
         </div>
       </div>
@@ -376,7 +384,10 @@ body.show-notes #notes{display:flex;flex-direction:column}
             <div class="pix">1 784,7 · 703,7</div>
           </div>
         </div>
-        <div class="banner ok">Une mire plate, parallèle au capteur, ne contient que le rapport <em>f<sub>x</sub> / Z</em>. Le séparer est un problème mal posé.</div>
+        <div class="formula">
+          \[ (\lambda f_x)\frac{X_c}{\lambda Z_c}=f_x\frac{X_c}{Z_c} \]
+        </div>
+        <div class="banner ok">Une mire plate, face au capteur, ne contient que le rapport \(f_x/Z\).</div>
       </div>
       <aside class="notes">
         <p class="say">Ce pixel va nous servir de test. On double la focale et on double la distance : il ne bouge pas. Toujours 1 784,7 et 703,7. Une mire plate, parallèle au capteur, ne contient que le rapport de la focale à la distance. Les séparer est impossible. Ce n’est pas un défaut du logiciel, c’est le problème qui est mal posé. On va le mesurer sur les vraies images. Je te laisse la calibration.</p>
@@ -388,15 +399,14 @@ body.show-notes #notes{display:flex;flex-direction:column}
       <div class="corners"></div>
       <p class="kicker">Zhang · 13 vues à plat, moins de 5°</p>
       <h1>0,17 px, et une focale qui glisse</h1>
-      <div class="content" style="justify-content:stretch">
-        <div class="split">
-          <figure class="fig">
-            <img src="img/inclinaison.png" alt="Inclinaison des 29 vues et couverture du champ">
-            <figcaption>Les 29 poses. Rouge : à plat, moins de 5°. Le tableau ne calibre que ces vues rouges.</figcaption>
-          </figure>
-          <table class="compact">
+      <div class="content" style="justify-content:stretch;gap:14px">
+        <figure class="fig band">
+          <img src="img/inclinaison.png" alt="Inclinaison des 29 vues et couverture du champ">
+          <figcaption>Les 29 poses, en largeur. Rouge : à plat, moins de 5°. Le tableau ne calibre que ces vues.</figcaption>
+        </figure>
+        <table class="compact">
             <thead>
-              <tr><th>Départ</th><th>f<sub>x</sub></th><th>Distance</th><th>f<sub>x</sub> / Z</th><th>RMS</th></tr>
+              <tr><th>Départ</th><th>\(f_x\)</th><th>Distance</th><th>\(f_x/Z\)</th><th>RMS</th></tr>
             </thead>
             <tbody>
               <tr><td>6 mm</td><td class="move">977 px</td><td class="move">703 mm</td><td class="const">1,390</td><td class="const">0,171</td></tr>
@@ -405,8 +415,7 @@ body.show-notes #notes{display:flex;flex-direction:column}
               <tr><td>12 mm</td><td class="move">1 268 px</td><td class="move">912 mm</td><td class="const">1,390</td><td class="const">0,171</td></tr>
             </tbody>
           </table>
-        </div>
-        <div class="banner warn"><strong>Difficulté.</strong> Sans a priori, autre point de la même vallée : f<sub>x</sub> = 20 690 px, distance 14,9 m, k<sub>3</sub> ≈ −133 000, et pourtant RMS = 0,19 px. L’incertitude affichée (±7 px) ne veut plus rien dire. Écart entre les quatre départs : 25 %.</div>
+        <div class="banner warn"><strong>Difficulté.</strong> Sans a priori, autre point de la même vallée : \(f_x=20690\,\mathrm{px}\), distance \(14{,}9\,\mathrm{m}\), \(k_3\approx -133\,000\), RMS \(0{,}19\,\mathrm{px}\). L’incertitude affichée, \(\pm 7\,\mathrm{px}\), ne veut plus rien dire. Écart entre les départs : \(25\,\%\).</div>
       </div>
       <aside class="notes">
         <p class="say">Zhang minimise l’écart entre les coins détectés et les coins reprojetés. L’algorithme est local. Sur la figure, en rouge, treize vues à plat, à moins de 5 degrés. Le tableau ne calibre qu’elles : RMS 0,17 pixel, mais la focale suit le départ, 977, 1 125, 1 214, 1 268 pixels. Vingt-cinq pour cent d’écart, et le rapport focale sur distance reste bloqué à 1,390. Sans a priori, autre point de la même vallée : 20 690 pixels, 14,9 mètres, un k₃ autour de moins 133 000, RMS encore 0,19 pixel. L’incertitude affichée ne veut plus rien dire. Difficulté centrale : une erreur excellente peut décrire une caméra fausse.</p>
@@ -421,20 +430,23 @@ body.show-notes #notes{display:flex;flex-direction:column}
       <div class="content" style="justify-content:stretch">
         <div class="stats">
           <div class="stat"><b>8,41 mm</b><span>focale estimée<br>nominale 8,00 mm · +5,1 %</span></div>
-          <div class="stat"><b>0,188 px</b><span>RMS · f<sub>x</sub> ≈ f<sub>y</sub><br>1 752 ± 2,3 px · centre (1 345, 939)</span></div>
+          <div class="stat"><b>0,188 px</b><span>RMS · \(f_x\approx f_y\)<br>\(1752\pm 2{,}3\,\mathrm{px}\), centre \((1345,\,939)\)</span></div>
           <div class="stat"><b>0,4 %</b><span>répétabilité<br>1 751 et 1 758,5 px</span></div>
           <div class="stat"><b>1 261 mm</b><span>damier posé à plat<br>bâche : 1 270 mm</span></div>
         </div>
-        <div class="banner ok">Les vues à plat avaient fixé f<sub>x</sub> / Z = 1,390 px/mm. Les vues inclinées fixent f<sub>x</sub> = 1 752 px. La distance du plan suit : 1 752 / 1,390 ≈ 1 261 mm.</div>
+        <div class="formula">
+          \[ \frac{f_x}{Z}=1{,}390~\mathrm{px/mm},\qquad f_x=1752~\mathrm{px},\qquad Z\approx 1261~\mathrm{mm} \]
+        </div>
         <div class="pair">
           <figure class="fig">
             <img src="img/rms-vues.png" alt="Erreur de reprojection vue par vue, RMS global 0,188 px">
+            <figcaption>Rouge à plat, bleu incliné. Chaque vue reste sous \(0{,}3\,\mathrm{px}\).</figcaption>
           </figure>
           <figure class="fig">
             <img src="img/distorsion.png" alt="Carte de distorsion, jusqu'à 30 pixels dans les coins">
+            <figcaption>\(k_1=-0{,}092\) : barillet. Jusqu’à \(30\,\mathrm{px}\) dans les coins.</figcaption>
           </figure>
         </div>
-        <p class="one-line">Départs : écart 0 %. On retient la répétabilité, 0,4 %, plutôt que l’écart-type de 0,13 %. k<sub>1</sub> = −0,092 : barillet, jusqu’à 30 px dans les coins. Chaque vue reste sous 0,3 px.</p>
       </div>
       <aside class="notes">
         <p class="say">Dès que le damier est incliné, jusqu’à 38 degrés, les coins ne sont plus à la même profondeur. Les quatre départs donnent la même solution. 1 752 pixels, soit 8,41 millimètres, et fₓ égale fᵧ. Le point principal mesuré est 1 345, 939, près du centre. Deux moitiés donnent 1 751 et 1 758,5 pixels, 0,4 pour cent : c’est l’incertitude qu’on retient, l’écart-type de 0,13 pour cent est trop optimiste. À gauche, chaque vue reste sous 0,3 pixel. À droite, k₁ vaut moins 0,092, un barillet, jusqu’à 30 pixels dans les coins. Le rapport 1,390 des vues à plat, divisé dans 1 752, redonne 1 261 millimètres. La mise au point n’explique que 0,6 pour cent des 5 pour cent d’écart au nominal. À toi la mesure.</p>
@@ -450,22 +462,22 @@ body.show-notes #notes{display:flex;flex-direction:column}
         <div class="pose">
           <figure class="fig">
             <img src="img/axes.png" alt="Repère de la bâche projeté sur la grille de cercles">
-            <figcaption>247 cercles. Repère : X rouge, Y vert, Z bleu, 400 mm. Caméra à 1 270 mm, inclinaison 0,11°.</figcaption>
+            <figcaption>247 cercles. \(X\) rouge, \(Y\) vert, \(Z\) bleu, 400 mm.</figcaption>
           </figure>
-          <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
-            <figure class="fig" style="flex:1">
-              <img src="img/redresse.png" alt="Image corrigée et image redressée à 0,5 mm par pixel">
-              <figcaption>Redressement : 1 px = 0,5 mm. Déjà presque de face, l’échelle devient métrique.</figcaption>
-            </figure>
-            <div class="stats" style="grid-template-columns:1fr 1fr">
-              <div class="stat"><b>1 270 mm</b><span>distance · centre (900, 607)</span></div>
-              <div class="stat"><b>0,11°</b><span>inclinaison de la bâche</span></div>
-              <div class="stat"><b>0,93 px</b><span>reprojection · max 4,23 px</span></div>
-              <div class="stat"><b>0,46 px</b><span>écart H<sub>pose</sub> / H<sub>fit</sub></span></div>
-            </div>
+          <div class="stats" style="grid-template-columns:1fr 1fr;height:100%;align-content:center">
+            <div class="stat"><b>1 270 mm</b><span>distance · centre \((900,\,607)\)</span></div>
+            <div class="stat"><b>0,11°</b><span>inclinaison de la bâche</span></div>
+            <div class="stat"><b>0,93 px</b><span>reprojection · max \(4{,}23\,\mathrm{px}\)</span></div>
+            <div class="stat"><b>0,46 px</b><span>écart \(H_{\mathrm{pose}}\) / \(H_{\mathrm{fit}}\)</span></div>
           </div>
         </div>
-        <div class="banner ok">H = K [ r<sub>1</sub> r<sub>2</sub> t ], seulement pour Z = 0. 1,38 px/mm dans H, et f<sub>x</sub> / Z = 1 752 / 1 270 = 1,38.</div>
+        <figure class="fig band">
+          <img src="img/redresse.png" alt="Image corrigée et image redressée à 0,5 mm par pixel">
+          <figcaption>Même scène, en largeur. À droite : 1 px = 0,5 mm, image de \(1920\times 1320\,\mathrm{mm}\).</figcaption>
+        </figure>
+        <div class="formula">
+          \[ H=K\,[r_1\ r_2\ t]\quad(Z_w=0),\qquad \frac{f_x}{Z}=1{,}38~\mathrm{px/mm} \]
+        </div>
       </div>
       <aside class="notes">
         <p class="say">K est connu. Une seule image de la bâche donne la pose : six inconnues, 247 cercles, image déjà corrigée. La caméra est à 1 270 millimètres, inclinée de 0,11 degré, au-dessus du centre de la grille. Presque de face : cette bâche, seule, n’aurait pas permis de calibrer K. D’où le damier incliné. Erreur moyenne 0,93 pixel, maximum 4,23. Tout est dans un plan, il reste une homographie. Depuis la pose ou par ajustement direct, l’écart est 0,46 pixel. Le facteur 1,38 pixel par millimètre, c’est la focale divisée par la distance. On peut redresser l’image à un demi-millimètre par pixel.</p>
@@ -507,10 +519,11 @@ body.show-notes #notes{display:flex;flex-direction:column}
           <div class="card para">
             <h2>Hors du plan</h2>
             <b>7,1 mm</b>
-            <p>Objet de 10 mm d’épaisseur à X = 900 mm, caméra à 1 270 mm. ΔX ≈ X h / Z. Dix fois le RMS de mesure. Un objectif télécentrique annule cet effet.</p>
+            <p>\[ \Delta X \approx X\frac{h}{Z}=900\times\frac{10}{1270}=7{,}1~\mathrm{mm} \]</p>
+            <p>Dix fois le RMS de mesure. Un objectif télécentrique annule cet effet.</p>
           </div>
         </div>
-        <div class="banner warn"><strong>Difficulté.</strong> Damiers rigides : résidu radial nul, même dans les coins. Bâche : +0,7 px au centre, −1,9 px au bord. Même motif sur les repères. La toile se bombe. On ne calibre pas K dessus.</div>
+        <div class="banner warn"><strong>Difficulté.</strong> Damiers rigides : résidu nul, même dans les coins. Bâche : \(+0{,}7\,\mathrm{px}\) au centre, \(-1{,}9\,\mathrm{px}\) au bord. La toile se bombe. On ne calibre pas \(K\) dessus.</div>
       </div>
       <aside class="notes">
         <p class="say">Le profil radial sépare les causes. Sur les damiers rigides, le résidu est nul, coins compris : le modèle d’objectif est bon. Sur la bâche, il est positif au centre et atteint moins 1,9 pixel au bord. Les repères dessinent la même courbe. La toile se bombe de quelques millimètres, et une homographie veut un plan parfait. C’est elle qui limite la mesure, autour du millimètre. On ne calibre donc pas les intrinsèques sur la bâche. Hors du plan, dix millimètres d’épaisseur à 900 millimètres de l’axe font 7,1 millimètres d’erreur, dix fois le RMS. Un objectif télécentrique annule cet effet.</p>
@@ -600,6 +613,8 @@ body.show-notes #notes{display:flex;flex-direction:column}
 
 <div id="blank"><button type="button" id="blank-timer" class="timer">10:00</button></div>
 
+<script src="katex/katex.min.js"></script>
+<script src="katex/contrib/auto-render.min.js"></script>
 <script>
 const NOMS = "";
 
@@ -858,6 +873,13 @@ document.getElementById("stage").addEventListener("touchend", (e) => {
 
 show(0);
 renderTimer();
+renderMathInElement(document.body, {
+  delimiters: [
+    {left: "\\[", right: "\\]", display: true},
+    {left: "\\(", right: "\\)", display: false}
+  ],
+  throwOnError: false
+});
 </script>
 </body>
 </html>
