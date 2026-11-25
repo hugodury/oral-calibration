@@ -189,7 +189,7 @@ table.compact th{padding-bottom:6px}
   font-family:"EB Garamond",serif;font-size:42px;font-style:italic;color:var(--teal);margin:0;
 }
 
-.slide.dark{background:#1c1915;color:#f4efe6}
+.slide.dark{background:#1c1915;color:#f4efe6;justify-content:center}
 .slide.dark .corners{color:rgba(244,239,230,.4)}
 .slide.dark .kicker{color:#e7a06a}
 .slide.dark h1,.slide.dark .byline{color:#f4efe6}
@@ -273,7 +273,6 @@ body.show-notes #notes{display:flex;flex-direction:column}
   <div class="chrome-actions">
     <button type="button" id="btn-prev" aria-label="Slide précédente">←</button>
     <button type="button" id="btn-next" aria-label="Slide suivante">→</button>
-    <button type="button" id="timer" class="timer pause" title="Cliquer pour lancer ou suspendre. Maj+clic : remettre à 10:00">10:00</button>
     <button type="button" id="btn-notes">Texte</button>
     <button type="button" id="btn-q">Questions</button>
     <button type="button" id="btn-help" aria-label="Aide">?</button>
@@ -288,12 +287,6 @@ body.show-notes #notes{display:flex;flex-direction:column}
       <p class="kicker">Traitement des images · journée 1</p>
       <h1>Calibrer une caméra</h1>
       <p class="byline" id="byline">Du sténopé à la mesure en millimètres<br>ING3 HPDA · CY Tech Pau · chapitre 3</p>
-      <div class="rule"></div>
-      <div class="deck-plan">
-        <div><b>0:00 — 3:20</b><strong>Voix A</strong><span>Le modèle, et ce qu’une image ne dit pas</span></div>
-        <div><b>3:20 — 6:15</b><strong>Voix B</strong><span>Zhang, le piège du RMS, la focale retenue</span></div>
-        <div><b>6:15 — 10:00</b><strong>Voix C</strong><span>Homographie, erreur en mm, limites</span></div>
-      </div>
       <aside class="notes">
         <p class="say">Bonjour. Nous présentons la calibration de la journée 1 : passer d’une image à une mesure en millimètres, et dire de combien on se trompe. Trois temps : le modèle, la calibration, puis la mesure et ses limites.</p>
         <p class="cut"><b>Si on est en retard.</b> Garder la dernière phrase et enchaîner.</p>
@@ -585,17 +578,15 @@ body.show-notes #notes{display:flex;flex-direction:column}
 <div class="overlay" id="help">
   <div class="panel">
     <h2>Pendant l’oral</h2>
-    <p class="hint">Ouvrir ce fichier dans un navigateur. Aucune connexion. Le jour J : texte masqué, chrono lancé au premier avancement.</p>
+    <p class="hint">Ouvrir ce fichier dans un navigateur. Le jour J : texte masqué.</p>
     <div class="keys">
       <kbd>→</kbd><span>slide suivante (espace, page suivante)</span>
       <kbd>←</kbd><span>slide précédente</span>
-      <kbd>T</kbd><span>lancer ou suspendre le chrono de 10:00</span>
-      <kbd>Maj+T</kbd><span>remettre le chrono à 10:00</span>
       <kbd>N</kbd><span>afficher ou cacher le texte à dire</span>
       <kbd>Q</kbd><span>questions probables</span>
       <kbd>O</kbd><span>sommaire des slides</span>
       <kbd>F</kbd><span>plein écran</span>
-      <kbd>B</kbd><span>écran noir, le chrono reste</span>
+      <kbd>B</kbd><span>écran noir</span>
       <kbd>C</kbd><span>masquer les boutons du bandeau</span>
       <kbd>1–9, 0</kbd><span>sauter à une slide (0 = la dernière)</span>
       <kbd>Échap</kbd><span>fermer un panneau</span>
@@ -611,7 +602,7 @@ body.show-notes #notes{display:flex;flex-direction:column}
   </div>
 </div>
 
-<div id="blank"><button type="button" id="blank-timer" class="timer">10:00</button></div>
+<div id="blank"></div>
 
 <script src="katex/katex.min.js"></script>
 <script src="katex/contrib/auto-render.min.js"></script>
@@ -649,8 +640,20 @@ const QUESTIONS = [
    "Deux raisons. Elle est à 0,11°, donc f et Z y sont dégénérés. Et elle n’est pas plane : son résidu radial serait absorbé par k₁ et biaiserait la focale. Intrinsèques sur le damier rigide, résidu radial nul. La bâche sert à la pose et à la mesure."],
   ["B","1 211 mm ou 1 261 mm ?",
    "summary affiche la moyenne de t_z sur les vues utilisées. Sur les 29 poses, 1 211 mm : les damiers inclinés sont tenus en l’air, à des distances variées. La distance au plan de travail est la médiane des seules vues à plat : 1 261 mm. Le PnP de la bâche donne 1 270 mm. Les 9 mm d’écart ont l’ordre de l’épaisseur de la mire posée sur la toile, et de la position du centre optique."],
-  ["C","Le PnP a un max de 4,2 px, la calibration 0,19. Est-ce un échec ?",
-   "Non. Le damier est rigide, coins au dixième de pixel. La bâche est souple : le plan ne peut pas tout absorber. 0,93 px en moyenne et 4,2 au max collent au résidu radial de ~2 px. On a passé une distorsion nulle à solvePnP parce que l’image était déjà corrigée. La remettre serait une double correction."],
+  ["C","Le PnP a un max de 4,23 px, la calibration 0,19. Est-ce un échec ?",
+   "Non. Le damier est rigide, coins au dixième de pixel. La bâche est souple : le plan ne peut pas tout absorber. 0,93 px en moyenne et 4,23 au max collent au résidu radial d’environ 2 px. On a passé une distorsion nulle à solvePnP parce que l’image était déjà corrigée. La remettre appliquerait la correction deux fois."],
+  ["B","Pourquoi certaines vues inclinées ont un RMS plus haut ?",
+   "Sur la figure, quelques barres bleues dépassent les rouges, jusqu’à environ 0,28 px. Certaines vues inclinées ont des reflets : le contraste baisse, les coins sont un peu moins nets. Tant que les 48 coins sont trouvés, la vue reste utile. Aucune ne dépasse 0,3 px, et le RMS global reste 0,188 px."],
+  ["B","Avez-vous mesuré la distance au mètre ruban ?",
+   "Non : la case DISTANCE_MESUREE_MM est restée vide. On compare donc au 1,25 m annoncé du banc. Damier posé à plat : 1 261 mm. Bâche : 1 270 mm. Les 9 mm ont l’ordre de l’épaisseur de la mire, et le centre optique est quelques centimètres derrière l’avant de l’objectif, là où l’on poserait le ruban."],
+  ["B","Quels sont les coefficients de distorsion retenus ?",
+   "Ordre OpenCV (k1, k2, p1, p2, k3) : −0,0925, 0,112, 0,0006, 0,0007, −0,023. k1 négatif : barillet, normal pour un 8 mm. p1 et p2 sont presque nuls : les lentilles sont bien centrées. La carte mesure jusqu’à 30 px dans les coins."],
+  ["A","Pourquoi le point principal n’est-il pas au centre ?",
+   "Le centre de l’image de travail est (1 368, 912). La calibration donne (1 345, 939) : environ −23 px en x et +27 px en y. À 4,8 µm, cela fait environ 0,1 mm sur le capteur. C’est un petit décentrage d’assemblage. On ne le fixe pas au centre : les images le mesurent."],
+  ["A","Qu’est-ce que le vecteur de Rodrigues ?",
+   "OpenCV ne stocke pas les 9 coefficients de R. rvec a 3 composantes : sa direction est l’axe de rotation, sa norme est l’angle en radians. R n’a que 3 degrés de liberté, parce que R transposée fois R vaut l’identité et que son déterminant vaut 1."],
+  ["B","Que se passe-t-il si une moitié ne contient que des vues à plat ?",
+   "On retombe dans le cas dégénéré, focale et distance indiscernables. Il faut trier les vues par inclinaison et en prendre une sur deux, pour que chaque moitié ait des vues inclinées. C’est ce qui a été fait : l’écart est alors 0,4 %, pas 25 %."],
   ["A","Lire le centre optique (900, 607, −1 270).",
    "t = (−902, −608, 1 268) mm est l’origine de la bâche vue depuis la caméra. C = −Rᵀ t est le centre optique dans le repère de la bâche. La grille va de 0 à 1 800 en X et de 0 à 1 200 en Y : la caméra est au-dessus du centre. R est presque l’identité, d’où 0,11°."],
   ["B","La partie webcam ?",
@@ -662,15 +665,8 @@ const QUESTIONS = [
 ];
 
 const slides = [...document.querySelectorAll(".slide")];
-const DURATION = 10 * 60 * 1000;
 let index = 0;
-let left = DURATION;
-let running = false;
-let lastTs = 0;
-let startedOnce = false;
 
-const timerEl = document.getElementById("timer");
-const blankTimer = document.getElementById("blank-timer");
 const notesWho = document.getElementById("notes-who");
 const notesPace = document.getElementById("notes-pace");
 const notesBody = document.getElementById("notes-body");
@@ -680,39 +676,6 @@ if (NOMS) {
   const b = document.getElementById("byline");
   b.innerHTML = NOMS + "<br>" + b.innerHTML;
 }
-
-function fmt(ms) {
-  const sign = ms < 0 ? "+" : "";
-  const t = Math.abs(ms);
-  const s = Math.floor(t / 1000);
-  return sign + Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
-}
-function fmtClock(sec) {
-  sec = Math.max(0, Math.round(sec));
-  return Math.floor(sec / 60) + ":" + String(sec % 60).padStart(2, "0");
-}
-function renderTimer() {
-  const label = fmt(left);
-  for (const el of [timerEl, blankTimer]) {
-    el.textContent = label;
-    el.classList.toggle("pause", !running);
-    el.classList.toggle("warn", left < 120000 && left >= 30000);
-    el.classList.toggle("late", left < 30000 && left >= 0);
-    el.classList.toggle("over", left < 0);
-  }
-}
-function loop() {
-  if (!running) return;
-  const now = Date.now();
-  if (lastTs) left -= now - lastTs;
-  lastTs = now;
-  renderTimer();
-  if (document.body.classList.contains("show-notes")) renderNotes();
-}
-setInterval(loop, 200);
-
-function toggleTimer() { running = !running; if (running) lastTs = 0; renderTimer(); }
-function resetTimer() { running = false; left = DURATION; lastTs = 0; startedOnce = false; renderTimer(); }
 
 slides.forEach((s, i) => {
   const b = document.createElement("button");
@@ -738,14 +701,10 @@ function show(i) {
   if (ov.childElementCount) [...ov.children].forEach((b, k) => b.classList.toggle("on", k === index));
 }
 
-function go(i, opts) {
-  const nextIdx = Math.max(0, Math.min(slides.length - 1, i));
-  if (opts && opts.start && index === 0 && nextIdx > 0 && !startedOnce) {
-    startedOnce = true; running = true; lastTs = 0;
-  }
-  show(nextIdx);
+function go(i) {
+  show(Math.max(0, Math.min(slides.length - 1, i)));
 }
-function next() { go(index + 1, {start:true}); }
+function next() { go(index + 1); }
 function prev() { go(index - 1); }
 
 function renderNotes() {
@@ -754,15 +713,7 @@ function renderNotes() {
   const nxt = slides[index + 1];
   const relay = nxt && nxt.dataset.who !== s.dataset.who ? " · passe la parole à la fin" : "";
   notesWho.textContent = who + relay;
-  const start = +s.dataset.start, end = +s.dataset.end;
-  let pace = "créneau " + fmtClock(start) + " → " + fmtClock(end);
-  if (running || left !== DURATION) {
-    const elapsed = (DURATION - left) / 1000;
-    if (elapsed < start) pace += " · " + Math.round(start - elapsed) + " s d’avance";
-    else if (elapsed > end) pace += " · " + Math.round(elapsed - end) + " s de retard";
-    else pace += " · dans le créneau, encore " + Math.round(end - elapsed) + " s";
-  }
-  notesPace.textContent = pace;
+  notesPace.textContent = "";
   notesBody.innerHTML = s.querySelector(".notes").innerHTML;
 }
 
@@ -787,7 +738,6 @@ function closeOverlays() {
 
 document.getElementById("btn-next").addEventListener("click", next);
 document.getElementById("btn-prev").addEventListener("click", prev);
-timerEl.addEventListener("click", (e) => { if (e.shiftKey) resetTimer(); else toggleTimer(); });
 document.getElementById("btn-notes").addEventListener("click", () => {
   document.body.classList.toggle("show-notes");
   renderNotes();
@@ -846,7 +796,6 @@ document.addEventListener("keydown", (e) => {
   else if (k === "ArrowLeft" || k === "PageUp" || k === "Backspace") { e.preventDefault(); prev(); }
   else if (k === "Home") go(0);
   else if (k === "End") go(slides.length - 1);
-  else if (k === "t" || k === "T") { if (e.shiftKey) resetTimer(); else toggleTimer(); }
   else if (k === "n" || k === "N") { document.body.classList.toggle("show-notes"); renderNotes(); requestAnimationFrame(fit); }
   else if (k === "q" || k === "Q") overlay("q-overlay");
   else if (k === "o" || k === "O") overlay("overview");
@@ -872,7 +821,6 @@ document.getElementById("stage").addEventListener("touchend", (e) => {
 }, {passive:true});
 
 show(0);
-renderTimer();
 renderMathInElement(document.body, {
   delimiters: [
     {left: "\\[", right: "\\]", display: true},
