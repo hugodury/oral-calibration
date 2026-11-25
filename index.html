@@ -181,7 +181,8 @@ td.move{color:var(--copper);font-weight:700}
 table.compact{font-size:20px}
 table.compact td{padding:7px 8px}
 table.compact th{padding-bottom:6px}
-.one-line{font-size:18px;line-height:1.35;color:var(--ink-soft);margin:0}
+.one-line,.plain{font-size:20px;line-height:1.35;color:var(--ink-soft);margin:0}
+.plain strong{color:var(--ink);font-weight:650}
 .take .num{font-family:"EB Garamond",serif;font-size:54px;line-height:.8;color:var(--teal)}
 .take h2{margin:0 0 4px;font-size:28px;font-family:"EB Garamond",serif;font-weight:400}
 .take p{margin:0;font-size:22px;line-height:1.3;color:var(--ink-soft)}
@@ -287,8 +288,9 @@ body.show-notes #notes{display:flex;flex-direction:column}
       <p class="kicker">Traitement des images · journée 1</p>
       <h1>Calibrer une caméra</h1>
       <p class="byline" id="byline">Du sténopé à la mesure en millimètres<br>ING3 HPDA · CY Tech Pau · chapitre 3</p>
+      <p class="plain" style="color:#d9d0c3;font-size:26px;max-width:28em;margin-top:28px">Une photo est en pixels. Calibrer, c’est trouver la formule qui les convertit en millimètres, puis dire de combien on se trompe.</p>
       <aside class="notes">
-        <p class="say">Bonjour. Nous présentons la calibration de la journée 1 : passer d’une image à une mesure en millimètres, et dire de combien on se trompe. Trois temps : le modèle, la calibration, puis la mesure et ses limites.</p>
+        <p class="say">Bonjour. Une photo est en pixels, et on veut des millimètres. Calibrer la caméra, c’est trouver la formule qui fait ce passage, puis chiffrer l’erreur. On suit trois étapes : le modèle, la calibration sur le damier, puis la mesure sur la bâche et ses limites.</p>
         <p class="cut"><b>Si on est en retard.</b> Garder la dernière phrase et enchaîner.</p>
       </aside>
     </section>
@@ -298,11 +300,11 @@ body.show-notes #notes{display:flex;flex-direction:column}
       <p class="kicker">Banc industriel · résolution de travail</p>
       <h1>Un pixel n’a pas encore d’unité</h1>
       <div class="content" style="justify-content:stretch">
-        <p class="one-line">D’abord <em>K</em> et la distorsion sur le damier, puis la pose sur la bâche, puis l’erreur sur des points qui n’ont pas servi au réglage.</p>
+        <p class="plain">Sans calibration, un pixel n’a aucune taille dans la pièce. On apprend d’abord la caméra avec un damier connu, puis on mesure sur la bâche, puis on vérifie sur d’autres points.</p>
         <div class="split">
           <figure class="fig">
             <img src="img/damiers.png" alt="Six vues du damier, à plat et inclinées, dans le champ">
-            <figcaption>Six des 29 vues. Damier déplacé dans tout le champ, à plat puis incliné. 29 détections sur 29.</figcaption>
+            <figcaption>Le damier est une grille connue : cases de 40 mm. On le bouge dans toute l’image, 29 fois. Les 48 coins sont trouvés à chaque fois.</figcaption>
           </figure>
           <div class="card">
             <h2>Le banc</h2>
@@ -320,7 +322,7 @@ body.show-notes #notes{display:flex;flex-direction:column}
         </div>
       </div>
       <aside class="notes">
-        <p class="say">Tant que la caméra n’est pas calibrée, un pixel n’a pas de longueur dans la scène. Le banc est une Basler, capteur de 5 472 par 3 648, photosites de 2,4 micromètres, objectif de 8 millimètres. On travaille à 2 736 par 1 824 : le pixel utile fait 4,8 micromètres, et la focale théorique vaut 1 667 pixels. Sur la photo, six des 29 vues : le damier circule dans le champ, à plat puis incliné, et les 48 coins sont détectés à chaque fois. La bâche est à environ 1 mètre 25. Les 63 repères posés à la main ne servent pas à régler le modèle. Ils servent à le contrôler.</p>
+        <p class="say">Sans calibration, un pixel n’a pas de taille dans la pièce. Le banc est une caméra Basler avec un objectif de 8 millimètres, à environ 1 mètre 25 d’une bâche. On travaille à mi-résolution : le pixel fait 4,8 micromètres, et la focale théorique vaut 1 667 pixels. Sur la photo, le damier, cases de 40 millimètres, est déplacé partout dans l’image : 29 photos, toutes détectées. Les 63 pastilles serviront seulement à vérifier, pas à régler.</p>
         <p class="cut"><b>Si on est en retard.</b> Caméra, 8 mm, 29 damiers, bâche à 1 mètre 25. Passer le détail du capteur.</p>
       </aside>
     </section>
@@ -330,6 +332,7 @@ body.show-notes #notes{display:flex;flex-direction:column}
       <p class="kicker">Modèle sténopé · quatre repères</p>
       <h1>Trois étapes, une matrice</h1>
       <div class="content">
+        <p class="plain"><strong>\(K\)</strong> décrit la caméra. <strong>\(R\) et \(t\)</strong> disent où elle est. On divise par la distance : plus c’est loin, plus c’est petit.</p>
         <div class="formula">
           \[ s\begin{pmatrix}u\\v\\1\end{pmatrix}=K\,[R\mid t]\begin{pmatrix}X\\Y\\Z\\1\end{pmatrix} \]
           <div class="sub"><span>monde, caméra, plan normalisé, pixels</span><span>\(s=Z_c\)</span></div>
@@ -338,22 +341,22 @@ body.show-notes #notes{display:flex;flex-direction:column}
           <div class="card step">
             <div class="n">01 · EXTRINSÈQUES</div>
             <h2>Monde → caméra</h2>
-            <p>Rotation R et translation t. Six paramètres. Ils changent dès que la caméra ou la mire bouge. OpenCV code R par un vecteur de Rodrigues.</p>
+            <p>Où est la caméra, et vers où regarde-t-elle. Six nombres. Ils changent dès qu’on la déplace.</p>
           </div>
           <div class="card step">
             <div class="n">02 · PERSPECTIVE</div>
             <h2>Diviser par Z<sub>c</sub></h2>
-            <p>\(x=X_c/Z_c\). Seule étape non linéaire. Tout un rayon donne le même pixel : une image ne contient pas la profondeur.</p>
+            <p>\(x=X_c/Z_c\). Un objet deux fois plus loin paraît deux fois plus petit. Une seule photo ne donne pas la distance.</p>
           </div>
           <div class="card step">
             <div class="n">03 · INTRINSÈQUES</div>
             <h2>Plan → pixels</h2>
-            <p>\(u=f_x x+c_x\). La distorsion de Brown–Conrady s’insère juste avant. Neuf intrinsèques en tout.</p>
+            <p>\(u=f_x x+c_x\). La focale et le centre de l’image. L’objectif déforme un peu avant, surtout dans les coins.</p>
           </div>
         </div>
       </div>
       <aside class="notes">
-        <p class="say">Un point du monde devient un pixel en trois étapes : le monde, la caméra, le plan normalisé, puis le pixel. Les extrinsèques, rotation et translation, six nombres, changent dès que la caméra bouge. Ensuite on divise par la profondeur. C’est la seule étape non linéaire : un rayon entier donne le même pixel, donc une image ne contient pas la distance. Enfin K : focale en pixels et point principal. La distorsion s’insère juste avant, dans le plan normalisé. Le point 300 millimètres, moins 150, à 1 mètre 20, tombe en 1 784,7 et 703,7. Le calcul à la main et OpenCV donnent le même pixel.</p>
+        <p class="say">Pour passer d’un point en millimètres à un pixel, trois étapes. D’abord où est la caméra : six nombres. Ensuite on divise par la distance : plus c’est loin, plus c’est petit, et une seule photo ne dit pas à quelle distance est l’objet. Enfin K transforme ça en pixels, avec la focale et le centre de l’image. L’objectif déforme un peu, surtout dans les coins. Exemple : le point 300 millimètres, moins 150, à 1 mètre 20, tombe en 1 784,7 et 703,7. Le calcul à la main et OpenCV donnent le même pixel.</p>
         <p class="cut"><b>Si on est en retard.</b> Dire les quatre repères et le pixel 1 784,7 et 703,7.</p>
       </aside>
     </section>
@@ -363,7 +366,7 @@ body.show-notes #notes{display:flex;flex-direction:column}
       <p class="kicker">Exercice 2 · le fil du TP</p>
       <h1>Doubler f et Z ne change rien</h1>
       <div class="content">
-        <p class="lead">Point P = (300, −150, 0) mm, caméra face à la scène.</p>
+        <p class="plain">Zoomer et reculer d’autant donne la même photo. Sur un objet plat, face à la caméra, on ne peut pas savoir si l’objectif est fort ou si l’objet est loin.</p>
         <div class="same">
           <div class="card eqcard">
             <div class="lbl">Réglage nominal</div>
@@ -383,7 +386,7 @@ body.show-notes #notes{display:flex;flex-direction:column}
         <div class="banner ok">Une mire plate, face au capteur, ne contient que le rapport \(f_x/Z\).</div>
       </div>
       <aside class="notes">
-        <p class="say">Ce pixel va nous servir de test. On double la focale et on double la distance : il ne bouge pas. Toujours 1 784,7 et 703,7. Une mire plate, parallèle au capteur, ne contient que le rapport de la focale à la distance. Les séparer est impossible. Ce n’est pas un défaut du logiciel, c’est le problème qui est mal posé. On va le mesurer sur les vraies images. Je te laisse la calibration.</p>
+        <p class="say">Voici le piège de tout le TP. On double la focale et on double la distance : le pixel ne bouge pas, toujours 1 784,7 et 703,7. Zoomer et reculer d’autant, c’est la même photo. Sur un objet plat face à la caméra, on ne mesure que le rapport focale sur distance. On ne peut pas les séparer. Ce n’est pas un bug du logiciel. Je te laisse le montrer sur les vraies images.</p>
         <p class="cut"><b>Relais vers B.</b> Si on est en retard : lire le bandeau et passer la parole.</p>
       </aside>
     </section>
@@ -392,10 +395,11 @@ body.show-notes #notes{display:flex;flex-direction:column}
       <div class="corners"></div>
       <p class="kicker">Zhang · 13 vues à plat, moins de 5°</p>
       <h1>0,17 px, et une focale qui glisse</h1>
+      <p class="plain">On ne garde que le damier posé à plat. L’erreur a l’air parfaite, mais la focale obtenue change selon le point de départ de l’algorithme.</p>
       <div class="content" style="justify-content:stretch;gap:14px">
         <figure class="fig band">
           <img src="img/inclinaison.png" alt="Inclinaison des 29 vues et couverture du champ">
-          <figcaption>Les 29 poses, en largeur. Rouge : à plat, moins de 5°. Le tableau ne calibre que ces vues.</figcaption>
+          <figcaption>Rouge : damier posé à plat, moins de 5°. Le tableau ne calibre que ces vues-là.</figcaption>
         </figure>
         <table class="compact">
             <thead>
@@ -411,7 +415,7 @@ body.show-notes #notes{display:flex;flex-direction:column}
         <div class="banner warn"><strong>Difficulté.</strong> Sans a priori, autre point de la même vallée : \(f_x=20690\,\mathrm{px}\), distance \(14{,}9\,\mathrm{m}\), \(k_3\approx -133\,000\), RMS \(0{,}19\,\mathrm{px}\). L’incertitude affichée, \(\pm 7\,\mathrm{px}\), ne veut plus rien dire. Écart entre les départs : \(25\,\%\).</div>
       </div>
       <aside class="notes">
-        <p class="say">Zhang minimise l’écart entre les coins détectés et les coins reprojetés. L’algorithme est local. Sur la figure, en rouge, treize vues à plat, à moins de 5 degrés. Le tableau ne calibre qu’elles : RMS 0,17 pixel, mais la focale suit le départ, 977, 1 125, 1 214, 1 268 pixels. Vingt-cinq pour cent d’écart, et le rapport focale sur distance reste bloqué à 1,390. Sans a priori, autre point de la même vallée : 20 690 pixels, 14,9 mètres, un k₃ autour de moins 133 000, RMS encore 0,19 pixel. L’incertitude affichée ne veut plus rien dire. Difficulté centrale : une erreur excellente peut décrire une caméra fausse.</p>
+        <p class="say">On ajuste la focale pour que les coins calculés retombent sur les coins vus. D’abord seulement le damier posé à plat : les barres rouges, moins de 5 degrés. L’erreur est superbe, 0,17 pixel. Mais dans le tableau, selon qu’on part de 6, 8, 10 ou 12 millimètres, on finit entre 977 et 1 268 pixels. Vingt-cinq pour cent d’écart, et le rapport focale sur distance reste bloqué à 1,390. Sans point de départ, l’algorithme part même à 20 000 pixels et 15 mètres, toujours avec 0,19 pixel d’erreur. Une petite erreur peut donc cacher une focale complètement fausse.</p>
         <p class="cut"><b>Si on est en retard.</b> Lire la ligne 8 mm et le cartel. Le rapport 1,390 est la phrase à ne pas couper.</p>
       </aside>
     </section>
@@ -420,12 +424,13 @@ body.show-notes #notes{display:flex;flex-direction:column}
       <div class="corners"></div>
       <p class="kicker">29/29 damiers · 16 vues inclinées, jusqu’à 38°</p>
       <h1>L’inclinaison fixe la focale</h1>
+      <p class="plain">Dès que le damier est penché, les cases du fond rapetissent. Cette perspective sépare la focale de la distance : les quatre départs donnent alors la même réponse.</p>
       <div class="content" style="justify-content:stretch">
         <div class="stats">
-          <div class="stat"><b>8,41 mm</b><span>focale estimée<br>nominale 8,00 mm · +5,1 %</span></div>
-          <div class="stat"><b>0,188 px</b><span>RMS · \(f_x\approx f_y\)<br>\(1752\pm 2{,}3\,\mathrm{px}\), centre \((1345,\,939)\)</span></div>
-          <div class="stat"><b>0,4 %</b><span>répétabilité<br>1 751 et 1 758,5 px</span></div>
-          <div class="stat"><b>1 261 mm</b><span>damier posé à plat<br>bâche : 1 270 mm</span></div>
+          <div class="stat"><b>8,41 mm</b><span>focale vraiment mesurée<br>l’objectif est marqué 8 mm</span></div>
+          <div class="stat"><b>0,188 px</b><span>erreur moyenne<br>entre coins vus et coins calculés</span></div>
+          <div class="stat"><b>0,4 %</b><span>deux moitiés d’images<br>donnent la même focale</span></div>
+          <div class="stat"><b>1 261 mm</b><span>distance du damier<br>la bâche est à 1 270 mm</span></div>
         </div>
         <div class="formula">
           \[ \frac{f_x}{Z}=1{,}390~\mathrm{px/mm},\qquad f_x=1752~\mathrm{px},\qquad Z\approx 1261~\mathrm{mm} \]
@@ -433,16 +438,16 @@ body.show-notes #notes{display:flex;flex-direction:column}
         <div class="pair">
           <figure class="fig">
             <img src="img/rms-vues.png" alt="Erreur de reprojection vue par vue, RMS global 0,188 px">
-            <figcaption>Rouge à plat, bleu incliné. Chaque vue reste sous \(0{,}3\,\mathrm{px}\).</figcaption>
+            <figcaption>Erreur de chaque photo. Rouge : à plat. Bleu : penché. Tout reste sous 0,3 px.</figcaption>
           </figure>
           <figure class="fig">
             <img src="img/distorsion.png" alt="Carte de distorsion, jusqu'à 30 pixels dans les coins">
-            <figcaption>\(k_1=-0{,}092\) : barillet. Jusqu’à \(30\,\mathrm{px}\) dans les coins.</figcaption>
+            <figcaption>L’objectif bombe les bords : \(k_1=-0{,}092\). Les coins bougent de 30 px.</figcaption>
           </figure>
         </div>
       </div>
       <aside class="notes">
-        <p class="say">Dès que le damier est incliné, jusqu’à 38 degrés, les coins ne sont plus à la même profondeur. Les quatre départs donnent la même solution. 1 752 pixels, soit 8,41 millimètres, et fₓ égale fᵧ. Le point principal mesuré est 1 345, 939, près du centre. Deux moitiés donnent 1 751 et 1 758,5 pixels, 0,4 pour cent : c’est l’incertitude qu’on retient, l’écart-type de 0,13 pour cent est trop optimiste. À gauche, chaque vue reste sous 0,3 pixel. À droite, k₁ vaut moins 0,092, un barillet, jusqu’à 30 pixels dans les coins. Le rapport 1,390 des vues à plat, divisé dans 1 752, redonne 1 261 millimètres. La mise au point n’explique que 0,6 pour cent des 5 pour cent d’écart au nominal. À toi la mesure.</p>
+        <p class="say">Quand on penche le damier, jusqu’à 38 degrés, les cases du fond rapetissent. Ça sépare enfin la focale de la distance. Les quatre départs donnent la même focale : 1 752 pixels, soit 8,41 millimètres, au lieu des 8 écrits sur l’objectif. Deux moitiés d’images donnent 1 751 et 1 758 pixels : 0,4 pour cent d’écart, c’est notre incertitude. À gauche, chaque photo reste sous 0,3 pixel d’erreur. À droite, l’objectif fait un barillet : les coins bougent de 30 pixels. Les vues à plat avaient fixé le rapport 1,390. Divisé dans 1 752, ça donne la distance du damier : 1 261 millimètres. À toi la mesure.</p>
         <p class="cut"><b>Garde-fou.</b> Les 1 211 mm du résumé OpenCV sont la moyenne de t<sub>z</sub> sur des damiers tenus en l’air. Le plan de travail, c’est 1 261 mm. <b>Relais vers C.</b></p>
       </aside>
     </section>
@@ -451,11 +456,12 @@ body.show-notes #notes{display:flex;flex-direction:column}
       <div class="corners"></div>
       <p class="kicker">PnP · 247 cercles · image déjà corrigée</p>
       <h1>Du plan au pixel</h1>
+      <p class="plain">La caméra est connue. Une seule photo de la bâche dit où elle est. Comme tout est dans un plan, une matrice \(H\) transforme les pixels en millimètres. Elle ne vaut que sur ce plan.</p>
       <div class="content" style="justify-content:stretch">
         <div class="pose">
           <figure class="fig">
             <img src="img/axes.png" alt="Repère de la bâche projeté sur la grille de cercles">
-            <figcaption>247 cercles. \(X\) rouge, \(Y\) vert, \(Z\) bleu, 400 mm.</figcaption>
+            <figcaption>Les 247 cercles sont trouvés. Les axes sont le repère de la bâche, longs de 400 mm.</figcaption>
           </figure>
           <div class="stats" style="grid-template-columns:1fr 1fr;height:100%;align-content:center">
             <div class="stat"><b>1 270 mm</b><span>distance · centre \((900,\,607)\)</span></div>
@@ -466,14 +472,14 @@ body.show-notes #notes{display:flex;flex-direction:column}
         </div>
         <figure class="fig band">
           <img src="img/redresse.png" alt="Image corrigée et image redressée à 0,5 mm par pixel">
-          <figcaption>Même scène, en largeur. À droite : 1 px = 0,5 mm, image de \(1920\times 1320\,\mathrm{mm}\).</figcaption>
+          <figcaption>À droite, la photo est redressée : 1 pixel vaut 0,5 mm.</figcaption>
         </figure>
         <div class="formula">
           \[ H=K\,[r_1\ r_2\ t]\quad(Z_w=0),\qquad \frac{f_x}{Z}=1{,}38~\mathrm{px/mm} \]
         </div>
       </div>
       <aside class="notes">
-        <p class="say">K est connu. Une seule image de la bâche donne la pose : six inconnues, 247 cercles, image déjà corrigée. La caméra est à 1 270 millimètres, inclinée de 0,11 degré, au-dessus du centre de la grille. Presque de face : cette bâche, seule, n’aurait pas permis de calibrer K. D’où le damier incliné. Erreur moyenne 0,93 pixel, maximum 4,23. Tout est dans un plan, il reste une homographie. Depuis la pose ou par ajustement direct, l’écart est 0,46 pixel. Le facteur 1,38 pixel par millimètre, c’est la focale divisée par la distance. On peut redresser l’image à un demi-millimètre par pixel.</p>
+        <p class="say">La caméra est connue. Une seule photo de la bâche suffit pour savoir où elle est. On trouve les 247 cercles. La caméra est à 1 270 millimètres, presque en face, à 0,11 degré, au centre de la grille. Comme tout est dans un seul plan, la projection devient une homographie : une matrice qui passe des millimètres aux pixels. On l’a calculée de deux façons, l’écart est 0,46 pixel. On peut alors redresser la photo pour qu’un pixel vaille un demi-millimètre. Cette matrice ne marche que sur le plan de la bâche.</p>
         <p class="cut"><b>Si on est en retard.</b> 1 270 mm, 0,11°, homographie à 0,46 px. Sauter le redressement.</p>
       </aside>
     </section>
@@ -482,20 +488,21 @@ body.show-notes #notes{display:flex;flex-direction:column}
       <div class="corners"></div>
       <p class="kicker">Validation hors apprentissage</p>
       <h1>L’erreur qui compte</h1>
+      <p class="plain">On ne teste pas sur les points qui ont servi à construire la formule. Un cercle sur deux règle \(H\), les autres servent de contrôle.</p>
       <div class="content" style="justify-content:stretch">
         <div class="pair">
           <figure class="fig">
             <img src="img/hist-erreur.png" alt="Histogramme de l'erreur avec et sans correction de distorsion">
-            <figcaption>Cercles tenus à l’écart. Avec correction : 0,64 mm, RMS 0,70, max 1,57. Sans : 2,75 · 3,03 · 5,15. La rangée de 1 800 mm est mesurée à 1 796 mm.</figcaption>
+            <figcaption>Vert : distorsion corrigée, environ 0,7 mm. Rouge : sans correction, environ 3 mm. Sur 1 800 mm, on mesure 1 796.</figcaption>
           </figure>
           <figure class="fig">
             <img src="img/reperes.png" alt="Erreur sur les 63 repères posés à la main">
-            <figcaption>63 pastilles, autre grille, alignées sans changer l’échelle. Moyenne 0,65 mm, RMS 0,77, max 2,31. Échelle −0,18 mm/m.</figcaption>
+            <figcaption>63 pastilles qui ne font pas partie de la grille. Erreur 0,65 mm. L’échelle est juste à 0,18 mm près par mètre.</figcaption>
           </figure>
         </div>
       </div>
       <aside class="notes">
-        <p class="say">On ne juge pas l’erreur sur les points qui ont servi à l’ajustement. Un cercle sur deux estime l’homographie, les autres la testent. Avec la distorsion corrigée : 0,64 millimètre en moyenne, 0,70 en RMS. Sans correction : 2,75 et 3,03. Un peu plus de quatre fois moins précis. Ces cercles restent la même grille. On a repris 63 repères collés à la main, tous les 200 millimètres. On enlève seulement une rotation et une translation, pas l’échelle. Moyenne 0,65 millimètre, RMS 0,77, échelle juste à 0,18 millimètre près par mètre. Sur 1,80 mètre, la rangée du haut donne 1 796 millimètres : quatre millimètres, au bord.</p>
+        <p class="say">Il ne faut pas mesurer l’erreur sur les points qui ont servi à construire la formule. Un cercle sur deux sert à l’estimer, les autres à la tester. En vert, distorsion corrigée : environ 0,7 millimètre. En rouge, sans correction : environ 3 millimètres, quatre fois plus. Pour vérifier, 63 pastilles collées à la main, qui ne font pas partie de la grille : 0,65 millimètre, et l’échelle est juste à 0,2 millimètre près par mètre. Sur 1 mètre 80, on mesure 1 796 millimètres.</p>
         <p class="cut"><b>Si on est en retard.</b> RMS 0,70 contre 3,03, puis les repères à 0,77. Les 1 800 mm peuvent sauter.</p>
       </aside>
     </section>
@@ -504,22 +511,24 @@ body.show-notes #notes{display:flex;flex-direction:column}
       <div class="corners"></div>
       <p class="kicker">Ce que l’homographie n’explique pas</p>
       <h1>Ensuite, c’est la scène</h1>
+      <p class="plain">L’objectif est bien modélisé : sur le damier rigide, l’erreur systématique est nulle. C’est la bâche, qui n’est pas parfaitement plane, qui limite la mesure.</p>
       <div class="content" style="justify-content:stretch">
         <div class="mini">
           <figure class="fig">
             <img src="img/radial.png" alt="Écart radial : nul sur les damiers, systématique sur la bâche">
+            <figcaption>Orange : la bâche s’écarte du plan. Le damier rigide, lui, reste sur zéro.</figcaption>
           </figure>
           <div class="card para">
             <h2>Hors du plan</h2>
             <b>7,1 mm</b>
             <p>\[ \Delta X \approx X\frac{h}{Z}=900\times\frac{10}{1270}=7{,}1~\mathrm{mm} \]</p>
-            <p>Dix fois le RMS de mesure. Un objectif télécentrique annule cet effet.</p>
+            <p>Un objet de 10 mm d’épaisseur, au bord, paraît décalé de 7 mm. Un objectif télécentrique supprime cet effet.</p>
           </div>
         </div>
         <div class="banner warn"><strong>Difficulté.</strong> Damiers rigides : résidu nul, même dans les coins. Bâche : \(+0{,}7\,\mathrm{px}\) au centre, \(-1{,}9\,\mathrm{px}\) au bord. La toile se bombe. On ne calibre pas \(K\) dessus.</div>
       </div>
       <aside class="notes">
-        <p class="say">Le profil radial sépare les causes. Sur les damiers rigides, le résidu est nul, coins compris : le modèle d’objectif est bon. Sur la bâche, il est positif au centre et atteint moins 1,9 pixel au bord. Les repères dessinent la même courbe. La toile se bombe de quelques millimètres, et une homographie veut un plan parfait. C’est elle qui limite la mesure, autour du millimètre. On ne calibre donc pas les intrinsèques sur la bâche. Hors du plan, dix millimètres d’épaisseur à 900 millimètres de l’axe font 7,1 millimètres d’erreur, dix fois le RMS. Un objectif télécentrique annule cet effet.</p>
+        <p class="say">Qui limite : la caméra, ou la bâche ? Sur les damiers, qui sont rigides, l’erreur systématique est nulle, même dans les coins. L’objectif est donc bien modélisé. Sur la bâche, l’erreur change avec la distance au centre : positive au milieu, moins 1,9 pixel au bord. La toile n’est pas plane, et notre formule suppose un plan parfait. C’est ça qui nous limite autour du millimètre. Si l’objet sort du plan, 10 millimètres d’épaisseur au bord font 7,1 millimètres d’erreur. Pour supprimer ça, il faut un objectif télécentrique : le grandissement ne dépend plus de la distance.</p>
         <p class="cut"><b>Si on est en retard.</b> Deux phrases : la bâche se bombe, 7 millimètres de parallaxe, télécentrique.</p>
       </aside>
     </section>
@@ -532,24 +541,24 @@ body.show-notes #notes{display:flex;flex-direction:column}
         <div class="take">
           <div class="num">1</div>
           <div>
-            <h2>Incliner, puis douter du départ</h2>
-            <p>RMS 0,19 px dans les deux cas. Écart de focale : 25 % à plat, 0 % avec les vues inclinées.</p>
+            <h2>Pencher le damier</h2>
+            <p>Une erreur de 0,2 px peut cacher une focale fausse. À plat, elle glisse de 25 %. Penché, les départs donnent la même focale.</p>
           </div>
           <div class="num">2</div>
           <div>
-            <h2>0,70 mm RMS, hors apprentissage</h2>
-            <p>Distorsion corrigée. Repères indépendants : 0,77 mm RMS, échelle à −0,18 mm/m.</p>
+            <h2>Mesurer à 0,7 mm</h2>
+            <p>Une fois la distorsion corrigée, sur des points qui n’ont pas servi à régler la formule. Les pastilles confirment l’échelle.</p>
           </div>
           <div class="num">3</div>
           <div>
-            <h2>Ensuite la scène domine</h2>
-            <p>Toile non plane, autour du millimètre. 10 mm d’épaisseur au bord : 7,1 mm. Objectif télécentrique.</p>
+            <h2>Puis c’est la bâche</h2>
+            <p>Elle n’est pas plane : on ne fait pas mieux que le millimètre. Un objet épais au bord se trompe de 7,1 mm.</p>
           </div>
         </div>
         <p class="ask">Questions.</p>
       </div>
       <aside class="notes">
-        <p class="say">Trois résultats. D’abord, un RMS de deux dixièmes de pixel peut cacher une focale fausse : seules les vues inclinées la fixent. Ensuite, sept dixièmes de millimètre RMS hors des points de réglage, et une échelle juste à deux dixièmes de millimètre par mètre. Enfin, c’est la scène qui domine : la planéité de la bâche, puis l’épaisseur des objets. Nous prenons les questions.</p>
+        <p class="say">Trois choses à retenir. Un : une erreur de 0,2 pixel peut cacher une focale fausse, il faut pencher le damier. Deux : une fois fait, on mesure à 0,7 millimètre près, vérifié sur des points qui n’ont pas servi au réglage. Trois : ensuite ce n’est plus la caméra qui limite, c’est la bâche qui n’est pas plane, et l’épaisseur des objets. Nous pouvons prendre les questions.</p>
         <p class="cut"><b>Questions.</b> Chacun répond sur sa partie. Touche Q sur l’ordinateur de préparation, pas à l’écran projeté.</p>
       </aside>
     </section>
