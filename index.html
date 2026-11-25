@@ -336,6 +336,7 @@ body.show-notes #notes{display:flex;flex-direction:column}
           <li><b>\(K\)</b> décrit la caméra : focale et centre de l’image. Ça ne change pas si on déplace la caméra.</li>
           <li><b>\(R\) et \(t\)</b> disent où elle est. Six nombres. Ils changent dès qu’on la bouge.</li>
           <li>On divise par la distance : deux fois plus loin, deux fois plus petit. <b>Une photo ne donne pas la distance.</b></li>
+          <li>L’objectif courbe les droites (Brown–Conrady). \(k_1&lt;0\) : barillet, les bords rentrent. \(k_1&gt;0\) : coussinet.</li>
           <li>Exemple : le point (300, −150) mm, à 1,20 m, tombe en <b>1 784,7</b> et <b>703,7</b>. À la main et avec OpenCV : le même pixel.</li>
         </ul>
         <div class="formula">
@@ -407,7 +408,7 @@ body.show-notes #notes{display:flex;flex-direction:column}
       <h1>0,17 px, et une focale qui glisse</h1>
       <ul class="script">
         <li>On ne garde que le damier <b>posé à plat</b> (barres rouges, moins de 5°).</li>
-        <li>L’erreur est toujours <b>0,171 px</b>. Elle a l’air parfaite.</li>
+        <li>L’erreur RMS — l’écart entre le coin vu et le coin recalculé — est toujours <b>0,171 px</b>. Elle a l’air parfaite.</li>
         <li>Pourtant la focale passe de <b>977 à 1 268 px</b> selon le départ : <b>25 %</b> d’écart.</li>
         <li>Le rapport focale / distance, lui, ne bouge pas : <b>1,390</b>.</li>
       </ul>
@@ -440,7 +441,7 @@ body.show-notes #notes{display:flex;flex-direction:column}
       <p class="kicker">29/29 damiers · 16 vues inclinées, jusqu’à 38°</p>
       <h1>L’inclinaison fixe la focale</h1>
       <ul class="script">
-        <li>On penche le damier, jusqu’à <b>38°</b>. Les cases du fond rapetissent.</li>
+        <li>Méthode de Zhang : plusieurs photos du damier. On le penche jusqu’à <b>38°</b>, les cases du fond rapetissent.</li>
         <li>Cette perspective <b>sépare la focale de la distance</b>. Les quatre départs donnent la même réponse.</li>
         <li><b>8,41 mm</b> mesurés, l’objectif est marqué 8 mm. Erreur moyenne <b>0,188 px</b>.</li>
         <li>Deux moitiés d’images : écart <b>0,4 %</b>. C’est l’incertitude à retenir. Distance du plan : <b>1 261 mm</b>.</li>
@@ -478,7 +479,7 @@ body.show-notes #notes{display:flex;flex-direction:column}
       <h1>Du plan au pixel</h1>
       <ul class="script">
         <li>La caméra est connue. <b>Une seule photo</b> de la bâche dit où elle est : <b>1 270 mm</b>, presque en face, 0,11°.</li>
-        <li>On trouve les <b>247 cercles</b>. Tout est dans un plan, donc une matrice <b>\(H\)</b> passe des pixels aux millimètres.</li>
+        <li>On trouve les <b>247 cercles</b>. \(H\) est une homographie : elle ne relie que le plan de la bâche aux pixels, puis aux millimètres.</li>
         <li>Deux calculs de \(H\) diffèrent de <b>0,46 px</b>. On redresse la photo : <b>1 px = 0,5 mm</b>.</li>
         <li><b>\(H\) ne marche que sur la bâche</b>, pas pour un objet qui a de l’épaisseur.</li>
       </ul>
@@ -515,7 +516,7 @@ body.show-notes #notes{display:flex;flex-direction:column}
       <h1>L’erreur qui compte</h1>
       <ul class="script">
         <li>On ne teste pas les points qui ont servi à construire la formule.</li>
-        <li><b>Un cercle sur deux</b> règle \(H\). Les autres servent de contrôle.</li>
+        <li>Validation hold-out : <b>un cercle sur deux</b> règle \(H\), les autres mesurent l’erreur. Sinon le chiffre est trop beau.</li>
         <li>Vert, distorsion corrigée : moyenne <b>0,64 mm</b>, RMS <b>0,70 mm</b>. Rouge, sans correction : <b>2,75</b> et <b>3,03 mm</b>, environ 4 fois plus.</li>
         <li>63 pastilles indépendantes : <b>0,65 mm</b>. Échelle juste à <b>−0,18 mm/m</b>. Sur 1 800 mm, on mesure <b>1 796 mm</b>.</li>
       </ul>
@@ -545,7 +546,7 @@ body.show-notes #notes{display:flex;flex-direction:column}
         <li>Sur le <b>damier rigide</b>, l’erreur systématique est nulle, même dans les coins. L’objectif est bien modélisé.</li>
         <li>Sur la <b>bâche</b> : +0,7 px au centre, −1,9 px au bord. La toile n’est pas plane.</li>
         <li>La formule suppose un plan parfait. C’est ça qui limite la mesure <b>autour du millimètre</b>.</li>
-        <li>Un objet de <b>10 mm</b> d’épaisseur au bord paraît décalé de <b>7,1 mm</b>. Un objectif télécentrique supprime cet effet.</li>
+        <li>Parallaxe : un objet de <b>10 mm</b> d’épaisseur au bord n’est pas sur la bâche. Il paraît décalé de <b>7,1 mm</b>. Un objectif télécentrique supprime cet effet.</li>
       </ul>
       <div class="content" style="justify-content:stretch">
         <div class="mini">
