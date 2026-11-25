@@ -302,7 +302,33 @@ body.show-notes #notes{display:flex;flex-direction:column}
       </aside>
     </section>
 
-    <section class="slide" data-who="A" data-title="Le banc" data-start="25" data-end="80">
+    <section class="slide" data-who="A" data-title="Les mots" data-start="20" data-end="70">
+      <div class="corners"></div>
+      <p class="kicker">À lire avant les calculs</p>
+      <h1>Les mots du TP</h1>
+      <div class="content">
+        <div class="cols">
+          <ul class="script">
+            <li><b>Sténopé.</b> L’objectif est réduit à un point. Les rayons vont tout droit.</li>
+            <li><b>Intrinsèques, \(K\).</b> La caméra et l’objectif. Ils ne changent pas si on déplace la caméra.</li>
+            <li><b>Extrinsèques, \(R\) et \(t\).</b> Où est la caméra, vers où elle regarde. Ils changent si on la bouge.</li>
+            <li><b>RMS.</b> Écart, en pixels, entre le coin vu et le coin recalculé. Petit ne veut pas dire juste.</li>
+          </ul>
+          <ul class="script">
+            <li><b>Cas dégénéré.</b> Les images ne permettent pas de séparer deux grandeurs. Ici, focale et distance, si le damier est à plat.</li>
+            <li><b>Homographie \(H\).</b> Matrice qui relie seulement le plan de la bâche aux pixels. Son inverse donne les millimètres.</li>
+            <li><b>Hold-out.</b> On règle sur une partie des points, on mesure l’erreur sur les autres.</li>
+            <li><b>Parallaxe.</b> Un objet qui n’est pas sur la bâche paraît décalé. Plus il est épais, plus c’est faux.</li>
+          </ul>
+        </div>
+      </div>
+      <aside class="notes">
+        <p class="say">Avant les chiffres, quatre mots à gauche, quatre à droite. Le sténopé, c’est l’objectif réduit à un point. K, c’est la caméra, ça ne change pas si on la déplace. R et t, c’est où elle est. Le RMS, c’est l’écart en pixels entre le coin vu et le coin recalculé : un petit RMS ne prouve pas que la focale est juste. Cas dégénéré : le damier à plat ne sépare pas focale et distance. H relie le plan de la bâche aux pixels. Hold-out : on teste sur des points mis de côté. Parallaxe : un objet épais, hors du plan, paraît décalé.</p>
+        <p class="cut"><b>Si on est en retard.</b> Lire seulement K, RMS, cas dégénéré, H et parallaxe.</p>
+      </aside>
+    </section>
+
+    <section class="slide" data-who="A" data-title="Le banc" data-start="70" data-end="120">
       <div class="corners"></div>
       <p class="kicker">Banc industriel · résolution de travail</p>
       <h1>Un pixel n’a pas encore d’unité</h1>
@@ -408,9 +434,9 @@ body.show-notes #notes{display:flex;flex-direction:column}
       <h1>0,17 px, et une focale qui glisse</h1>
       <ul class="script">
         <li>On ne garde que le damier <b>posé à plat</b> (barres rouges, moins de 5°).</li>
-        <li>L’erreur RMS — l’écart entre le coin vu et le coin recalculé — est toujours <b>0,171 px</b>. Elle a l’air parfaite.</li>
-        <li>Pourtant la focale passe de <b>977 à 1 268 px</b> selon le départ : <b>25 %</b> d’écart.</li>
-        <li>Le rapport focale / distance, lui, ne bouge pas : <b>1,390</b>.</li>
+        <li>Avec un départ imposé, de 6 à 12 mm : RMS toujours <b>0,171 px</b>, mais \(f_x\) passe de <b>977 à 1 268 px</b>, soit <b>25 %</b>.</li>
+        <li>Sans aucun départ : RMS <b>0,190 px</b>, mais \(f_x=\) <b>20 690 px</b> et distance <b>14,9 m</b>. Physiquement faux.</li>
+        <li>Le rapport \(f_x/Z\) reste <b>1,390</b>. C’est le cas dégénéré : on ne sépare pas la focale de la distance.</li>
       </ul>
       <div class="content" style="justify-content:stretch;gap:14px">
         <figure class="fig band">
@@ -428,10 +454,10 @@ body.show-notes #notes{display:flex;flex-direction:column}
               <tr><td>12 mm</td><td class="move">1 268 px</td><td class="move">912 mm</td><td class="const">1,390</td><td class="const">0,171</td></tr>
             </tbody>
           </table>
-        <div class="banner warn"><strong>Difficulté.</strong> Sans a priori, autre point de la même vallée : \(f_x=20690\,\mathrm{px}\), distance \(14{,}9\,\mathrm{m}\), \(k_3\approx -133\,000\), RMS \(0{,}19\,\mathrm{px}\). L’incertitude affichée, \(\pm 7\,\mathrm{px}\), ne veut plus rien dire. Écart entre les départs : \(25\,\%\).</div>
+        <div class="banner warn"><strong>À dire.</strong> Le modèle passe par les points, donc le RMS est petit. Il ne dit pas que la focale est la bonne. L’algorithme compense avec une distorsion absurde, \(k_3\approx -133\,000\).</div>
       </div>
       <aside class="notes">
-        <p class="say">On ne garde que le damier posé à plat, les barres rouges, moins de 5 degrés. L’erreur est toujours 0,171 pixel, elle a l’air parfaite. Mais la focale passe de 977 à 1 268 pixels selon le départ : 25 pour cent d’écart. Le rapport focale sur distance ne bouge pas, 1,390. Sans point de départ, on obtient même 20 690 pixels et 14,9 mètres, avec encore 0,19 pixel d’erreur. Une petite erreur peut cacher une focale fausse.</p>
+        <p class="say">On ne garde que le damier posé à plat, les barres rouges. Avec un départ de 6 à 12 millimètres, l’erreur RMS reste 0,171 pixel, mais la focale passe de 977 à 1 268 pixels, 25 pour cent. Sans aucun départ, le RMS est 0,190 pixel, pourtant la focale sort à 20 690 pixels et la distance à 14,9 mètres. C’est physiquement faux. Le rapport focale sur distance reste 1,390. C’est le cas dégénéré : on ne sépare pas les deux. Une petite erreur ne prouve pas que la focale est juste.</p>
         <p class="cut"><b>Si on est en retard.</b> Lire la ligne 8 mm et le cartel. Le rapport 1,390 est la phrase à ne pas couper.</p>
       </aside>
     </section>
