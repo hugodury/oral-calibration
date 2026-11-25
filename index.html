@@ -331,7 +331,7 @@ body.show-notes #notes{display:flex;flex-direction:column}
       <div class="content">
         <div class="formula">
           s (u, v, 1)<sup>T</sup> = K [ R | t ] (X, Y, Z, 1)<sup>T</sup>
-          <div class="sub"><span>K · intrinsèques</span><span>R, t · pose</span><span>s = Z<sub>c</sub></span></div>
+          <div class="sub"><span>monde → caméra → plan normalisé → pixels</span><span>K · intrinsèques</span><span>s = Z<sub>c</sub></span></div>
         </div>
         <div class="cols g3">
           <div class="card step">
@@ -352,8 +352,8 @@ body.show-notes #notes{display:flex;flex-direction:column}
         </div>
       </div>
       <aside class="notes">
-        <p class="say">Un point du monde devient un pixel en trois étapes. Les extrinsèques, rotation et translation : six nombres, ils changent dès que la caméra bouge. Ensuite la perspective, on divise par la profondeur. C’est la seule étape non linéaire. Un rayon entier s’écrase sur un seul pixel, donc une image ne contient pas la distance. Enfin la matrice K : focale en pixels et point principal. Elle ne dépend que de l’objectif et du capteur. La distorsion s’insère entre les deux, dans le plan normalisé. Sur l’exemple du notebook, le point 300 millimètres, moins 150, vu à 1 mètre 20, tombe au pixel 1 785, 704. Le calcul à la main et OpenCV donnent le même point.</p>
-        <p class="cut"><b>Si on est en retard.</b> Dire les trois étapes et le pixel 1 785, 704. La distorsion revient à la slide suivante.</p>
+        <p class="say">Un point du monde devient un pixel en trois étapes : le monde, la caméra, le plan normalisé, puis le pixel. Les extrinsèques, rotation et translation, six nombres, changent dès que la caméra bouge. Ensuite on divise par la profondeur. C’est la seule étape non linéaire : un rayon entier donne le même pixel, donc une image ne contient pas la distance. Enfin K : focale en pixels et point principal. La distorsion s’insère juste avant, dans le plan normalisé. Le point 300 millimètres, moins 150, à 1 mètre 20, tombe en 1 784,7 et 703,7. Le calcul à la main et OpenCV donnent le même pixel.</p>
+        <p class="cut"><b>Si on est en retard.</b> Dire les quatre repères et le pixel 1 784,7 et 703,7.</p>
       </aside>
     </section>
 
@@ -367,19 +367,19 @@ body.show-notes #notes{display:flex;flex-direction:column}
           <div class="card eqcard">
             <div class="lbl">Réglage nominal</div>
             <ul><li>f = 1 667 px</li><li>Z = 1 200 mm</li></ul>
-            <div class="pix">1 785 , 704</div>
+            <div class="pix">1 784,7 · 703,7</div>
           </div>
           <div class="arrow">même<br>pixel</div>
           <div class="card eqcard">
             <div class="lbl">Focale et distance doublées</div>
             <ul><li>f = 3 333 px</li><li>Z = 2 400 mm</li></ul>
-            <div class="pix">1 785 , 704</div>
+            <div class="pix">1 784,7 · 703,7</div>
           </div>
         </div>
         <div class="banner ok">Une mire plate, parallèle au capteur, ne contient que le rapport <em>f<sub>x</sub> / Z</em>. Le séparer est un problème mal posé.</div>
       </div>
       <aside class="notes">
-        <p class="say">Ce pixel va nous servir de test. On double la focale et on double la distance : il ne bouge pas. Toujours 1 785, 704. Une mire plate, parallèle au capteur, ne contient que le rapport de la focale à la distance. Les séparer est impossible. Ce n’est pas un défaut du logiciel, c’est le problème qui est mal posé. On va le mesurer sur les vraies images. Je te laisse la calibration.</p>
+        <p class="say">Ce pixel va nous servir de test. On double la focale et on double la distance : il ne bouge pas. Toujours 1 784,7 et 703,7. Une mire plate, parallèle au capteur, ne contient que le rapport de la focale à la distance. Les séparer est impossible. Ce n’est pas un défaut du logiciel, c’est le problème qui est mal posé. On va le mesurer sur les vraies images. Je te laisse la calibration.</p>
         <p class="cut"><b>Relais vers B.</b> Si on est en retard : lire le bandeau et passer la parole.</p>
       </aside>
     </section>
@@ -392,6 +392,7 @@ body.show-notes #notes{display:flex;flex-direction:column}
         <div class="split">
           <figure class="fig">
             <img src="img/inclinaison.png" alt="Inclinaison des 29 vues et couverture du champ">
+            <figcaption>Les 29 poses. Rouge : à plat, moins de 5°. Le tableau ne calibre que ces vues rouges.</figcaption>
           </figure>
           <table class="compact">
             <thead>
@@ -408,7 +409,7 @@ body.show-notes #notes{display:flex;flex-direction:column}
         <div class="banner warn"><strong>Difficulté.</strong> Sans a priori, autre point de la même vallée : f<sub>x</sub> = 20 690 px, distance 14,9 m, k<sub>3</sub> ≈ −133 000, et pourtant RMS = 0,19 px. L’incertitude affichée (±7 px) ne veut plus rien dire. Écart entre les quatre départs : 25 %.</div>
       </div>
       <aside class="notes">
-        <p class="say">Zhang minimise l’écart entre les coins détectés et les coins reprojetés. L’algorithme est local. Sur la figure, en rouge, les 13 vues à plat : le RMS est très bon, 0,17 pixel. La focale, elle, suit le point de départ : 977, 1 125, 1 214, 1 268 pixels. Vingt-cinq pour cent d’écart, RMS identique. Le rapport focale sur distance reste bloqué à 1,390. Sans a priori, autre point de la même vallée : 20 690 pixels, 14,9 mètres, un k₃ autour de moins 133 000, et un RMS de 0,19 pixel. L’incertitude affichée ne veut plus rien dire. Difficulté centrale : une erreur excellente peut décrire une caméra fausse.</p>
+        <p class="say">Zhang minimise l’écart entre les coins détectés et les coins reprojetés. L’algorithme est local. Sur la figure, en rouge, treize vues à plat, à moins de 5 degrés. Le tableau ne calibre qu’elles : RMS 0,17 pixel, mais la focale suit le départ, 977, 1 125, 1 214, 1 268 pixels. Vingt-cinq pour cent d’écart, et le rapport focale sur distance reste bloqué à 1,390. Sans a priori, autre point de la même vallée : 20 690 pixels, 14,9 mètres, un k₃ autour de moins 133 000, RMS encore 0,19 pixel. L’incertitude affichée ne veut plus rien dire. Difficulté centrale : une erreur excellente peut décrire une caméra fausse.</p>
         <p class="cut"><b>Si on est en retard.</b> Lire la ligne 8 mm et le cartel. Le rapport 1,390 est la phrase à ne pas couper.</p>
       </aside>
     </section>
@@ -420,8 +421,8 @@ body.show-notes #notes{display:flex;flex-direction:column}
       <div class="content" style="justify-content:stretch">
         <div class="stats">
           <div class="stat"><b>8,41 mm</b><span>focale estimée<br>nominale 8,00 mm · +5,1 %</span></div>
-          <div class="stat"><b>0,188 px</b><span>RMS global<br>f<sub>x</sub> = 1 752 ± 2,3 px</span></div>
-          <div class="stat"><b>0,4 %</b><span>répétabilité<br>1 751 contre 1 759 px</span></div>
+          <div class="stat"><b>0,188 px</b><span>RMS · f<sub>x</sub> ≈ f<sub>y</sub><br>1 752 ± 2,3 px · centre (1 345, 939)</span></div>
+          <div class="stat"><b>0,4 %</b><span>répétabilité<br>1 751 et 1 758,5 px</span></div>
           <div class="stat"><b>1 261 mm</b><span>damier posé à plat<br>bâche : 1 270 mm</span></div>
         </div>
         <div class="banner ok">Les vues à plat avaient fixé f<sub>x</sub> / Z = 1,390 px/mm. Les vues inclinées fixent f<sub>x</sub> = 1 752 px. La distance du plan suit : 1 752 / 1,390 ≈ 1 261 mm.</div>
@@ -433,10 +434,10 @@ body.show-notes #notes{display:flex;flex-direction:column}
             <img src="img/distorsion.png" alt="Carte de distorsion, jusqu'à 30 pixels dans les coins">
           </figure>
         </div>
-        <p class="one-line">Départ : écart 0 %. Écart-type 0,13 %. Répétabilité 0,4 %. Distorsion : jusqu’à 30 px dans les coins, et les vues inclinées ne sont pas pires que les vues à plat.</p>
+        <p class="one-line">Départs : écart 0 %. On retient la répétabilité, 0,4 %, plutôt que l’écart-type de 0,13 %. k<sub>1</sub> = −0,092 : barillet, jusqu’à 30 px dans les coins. Chaque vue reste sous 0,3 px.</p>
       </div>
       <aside class="notes">
-        <p class="say">Dès que le damier est incliné, jusqu’à 38 degrés, les coins ne sont plus à la même profondeur. Les quatre départs donnent la même solution, à zéro pour cent près. 1 752 pixels, soit 8,41 millimètres. Deux moitiés indépendantes s’écartent de 0,4 pour cent : c’est l’incertitude qu’on retient. Sur la figure de gauche, l’erreur reste autour de 0,19 pixel, vues inclinées comprises. À droite, la distorsion déplace les coins de 30 pixels. Le rapport des vues à plat était 1,390. Divisé dans 1 752, il redonne 1 261 millimètres. Les 5 pour cent au-dessus du nominal ne viennent pas de la mise au point, qui n’explique que 0,6 pour cent. À toi la mesure.</p>
+        <p class="say">Dès que le damier est incliné, jusqu’à 38 degrés, les coins ne sont plus à la même profondeur. Les quatre départs donnent la même solution. 1 752 pixels, soit 8,41 millimètres, et fₓ égale fᵧ. Le point principal mesuré est 1 345, 939, près du centre. Deux moitiés donnent 1 751 et 1 758,5 pixels, 0,4 pour cent : c’est l’incertitude qu’on retient, l’écart-type de 0,13 pour cent est trop optimiste. À gauche, chaque vue reste sous 0,3 pixel. À droite, k₁ vaut moins 0,092, un barillet, jusqu’à 30 pixels dans les coins. Le rapport 1,390 des vues à plat, divisé dans 1 752, redonne 1 261 millimètres. La mise au point n’explique que 0,6 pour cent des 5 pour cent d’écart au nominal. À toi la mesure.</p>
         <p class="cut"><b>Garde-fou.</b> Les 1 211 mm du résumé OpenCV sont la moyenne de t<sub>z</sub> sur des damiers tenus en l’air. Le plan de travail, c’est 1 261 mm. <b>Relais vers C.</b></p>
       </aside>
     </section>
@@ -459,7 +460,7 @@ body.show-notes #notes{display:flex;flex-direction:column}
             <div class="stats" style="grid-template-columns:1fr 1fr">
               <div class="stat"><b>1 270 mm</b><span>distance · centre (900, 607)</span></div>
               <div class="stat"><b>0,11°</b><span>inclinaison de la bâche</span></div>
-              <div class="stat"><b>0,93 px</b><span>reprojection · max 4,2 px</span></div>
+              <div class="stat"><b>0,93 px</b><span>reprojection · max 4,23 px</span></div>
               <div class="stat"><b>0,46 px</b><span>écart H<sub>pose</sub> / H<sub>fit</sub></span></div>
             </div>
           </div>
@@ -467,7 +468,7 @@ body.show-notes #notes{display:flex;flex-direction:column}
         <div class="banner ok">H = K [ r<sub>1</sub> r<sub>2</sub> t ], seulement pour Z = 0. 1,38 px/mm dans H, et f<sub>x</sub> / Z = 1 752 / 1 270 = 1,38.</div>
       </div>
       <aside class="notes">
-        <p class="say">K est connu. Une seule image de la bâche donne la pose : six inconnues, 247 cercles, image déjà corrigée. La caméra est à 1 270 millimètres, inclinée de 0,11 degré, au-dessus du centre de la grille. Presque de face : cette bâche, seule, n’aurait pas permis de calibrer K. D’où le damier incliné. Erreur moyenne 0,93 pixel, maximum 4,2. Tout est dans un plan, il reste une homographie. Depuis la pose ou par ajustement direct, l’écart est 0,46 pixel. Le facteur 1,38 pixel par millimètre, c’est la focale divisée par la distance. On peut redresser l’image à un demi-millimètre par pixel.</p>
+        <p class="say">K est connu. Une seule image de la bâche donne la pose : six inconnues, 247 cercles, image déjà corrigée. La caméra est à 1 270 millimètres, inclinée de 0,11 degré, au-dessus du centre de la grille. Presque de face : cette bâche, seule, n’aurait pas permis de calibrer K. D’où le damier incliné. Erreur moyenne 0,93 pixel, maximum 4,23. Tout est dans un plan, il reste une homographie. Depuis la pose ou par ajustement direct, l’écart est 0,46 pixel. Le facteur 1,38 pixel par millimètre, c’est la focale divisée par la distance. On peut redresser l’image à un demi-millimètre par pixel.</p>
         <p class="cut"><b>Si on est en retard.</b> 1 270 mm, 0,11°, homographie à 0,46 px. Sauter le redressement.</p>
       </aside>
     </section>
@@ -480,11 +481,11 @@ body.show-notes #notes{display:flex;flex-direction:column}
         <div class="pair">
           <figure class="fig">
             <img src="img/hist-erreur.png" alt="Histogramme de l'erreur avec et sans correction de distorsion">
-            <figcaption>Un cercle sur deux pour estimer H. Avec correction : moyenne 0,64 mm, RMS 0,70, max 1,57. Sans : 2,75 · 3,03 · 5,15. Facteur 4,3.</figcaption>
+            <figcaption>Cercles tenus à l’écart. Avec correction : 0,64 mm, RMS 0,70, max 1,57. Sans : 2,75 · 3,03 · 5,15. La rangée de 1 800 mm est mesurée à 1 796 mm.</figcaption>
           </figure>
           <figure class="fig">
             <img src="img/reperes.png" alt="Erreur sur les 63 repères posés à la main">
-            <figcaption>63 pastilles, autre grille. Moyenne 0,65 mm, RMS 0,77, max 2,31. Échelle −0,18 mm/m. Sur 1 800 mm : mesuré 1 796.</figcaption>
+            <figcaption>63 pastilles, autre grille, alignées sans changer l’échelle. Moyenne 0,65 mm, RMS 0,77, max 2,31. Échelle −0,18 mm/m.</figcaption>
           </figure>
         </div>
       </div>
@@ -606,11 +607,11 @@ const QUESTIONS = [
   ["B","Pourquoi un RMS de 0,17 px ne valide pas les vues à plat ?",
    "Le RMS dit que le modèle passe par les pixels. Ici plusieurs modèles le font aussi bien : de 977 à 1 268 px de focale, le RMS reste 0,171. Sans a priori on atteint même 20 690 px et 14,9 m, RMS 0,19. Toutes ces solutions gardent fₓ/Z ≈ 1,390. Une erreur faible est nécessaire. Elle ne dit pas que f et Z sont séparés."],
   ["B","Que signifie le rapport 1,390 ?",
-   "Mire parallèle au capteur : u − cₓ = fₓ X / Z. Multiplier fₓ et Z par le même facteur ne change pas le pixel. C’est l’exercice 2, retrouvé sur les données : 1 785, 704 dans les deux cas. Les vues à plat mesurent ce rapport, rien d’autre."],
+   "Mire parallèle au capteur : u − cₓ = fₓ X / Z. Multiplier fₓ et Z par le même facteur ne change pas le pixel. C’est l’exercice 2, retrouvé sur les données : 1 784,7 et 703,7 dans les deux cas. Les vues à plat mesurent ce rapport, rien d’autre."],
   ["B","À quoi sert CALIB_USE_INTRINSIC_GUESS ?",
    "« Pars de cette K », puis les images décident. Avec les vues inclinées, les départs 6, 8, 10 et 12 mm donnent la même focale : le guess ne fait qu’accélérer. À plat, même en partant de 8 mm, on finit à 1 125 px. Pour imposer la focale il faut CALIB_FIX_FOCAL_LENGTH : f fixée à 8 mm donne un RMS de 0,172 px et 1 199 mm, distance déduite de cette focale imposée."],
   ["B","Pourquoi retenir 0,4 % plutôt que l’écart-type 0,13 % ?",
-   "calibrateCameraExtended suppose le modèle exact et des erreurs aléatoires. À plat, il annonçait ±0,5 px pendant que la focale bougeait de 25 %, et ±7 px sur les 20 690 px absurdes. La répétabilité coupe les 29 vues en deux moitiés intercalées, chacune avec des inclinées : 1 751 contre 1 759 px, soit 0,4 %. C’est l’incertitude pratique."],
+   "calibrateCameraExtended suppose le modèle exact et des erreurs aléatoires. À plat, il annonçait ±0,5 px pendant que la focale bougeait de 25 %, et ±7 px sur les 20 690 px absurdes. La répétabilité coupe les 29 vues en deux moitiés intercalées, chacune avec des inclinées : 1 751 et 1 758,5 px, soit 0,4 %. C’est l’incertitude pratique."],
   ["B","8,41 mm au lieu de 8,00, est-ce une erreur ?",
    "Non. Mise au point à 1,26 m : v = f Z / (Z − f) = 8,05 mm, soit +0,6 % seulement. Il reste environ +4,5 %, l’ordre d’une tolérance de fabrication. La répétabilité est 0,4 %, donc ±0,03 mm. L’écart à 8,05 mm vaut 0,36 mm, environ dix fois cette incertitude : c’est un biais, pas du bruit. Les deux moitiés donnent 8,40 et 8,44 mm."],
   ["B","Pourquoi incliner, et pourquoi les coins ?",
