@@ -1,0 +1,10 @@
+Polices embarquées pour une présentation hors ligne.
+
+EB Garamond — Copyright (c) 2010-2017 Georg Duffner et Octavio Pardo.
+Licence SIL Open Font License 1.1.
+
+Cabin — Copyright (c) 2010-2016 Pablo Impallari.
+Licence SIL Open Font License 1.1.
+
+Cousine — Copyright (c) 2010 Google / Steve Matteson.
+Licence Apache 2.0.

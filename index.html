@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Oral · Calibrer une caméra</title>
+<style>
+@font-face{font-family:"EB Garamond";src:url("fonts/EBGaramond12-Regular.ttf") format("truetype");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:"EB Garamond";src:url("fonts/EBGaramond12-Italic.ttf") format("truetype");font-weight:400;font-style:italic;font-display:swap}
+@font-face{font-family:"EB Garamond";src:url("fonts/EBGaramond12-Bold.ttf") format("truetype");font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:Cabin;src:url("fonts/Cabin-Regular.otf") format("opentype");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:Cabin;src:url("fonts/Cabin-Medium.otf") format("opentype");font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:Cabin;src:url("fonts/Cabin-SemiBold.otf") format("opentype");font-weight:600;font-style:normal;font-display:swap}
+@font-face{font-family:Cabin;src:url("fonts/Cabin-Bold.otf") format("opentype");font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:Cousine;src:url("fonts/Cousine-Regular.ttf") format("truetype");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:Cousine;src:url("fonts/Cousine-Bold.ttf") format("truetype");font-weight:700;font-style:normal;font-display:swap}
+
+:root{
+  --ink:#1c1915;
+  --ink-soft:#3a342c;
+  --muted:#5c564c;
+  --line:#ddd4c6;
+  --paper:#f4efe6;
+  --paper-2:#ebe4d6;
+  --teal:#0e5e57;
+  --teal-soft:#e4f1ee;
+  --copper:#9a4318;
+  --copper-soft:#f8ebe3;
+  --good:#1b5c38;
+  --stage:#241f1b;
+  --fit:1;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--stage);color:var(--ink)}
+body{font-family:Cabin,sans-serif;display:flex;flex-direction:column;overflow:hidden;height:100vh}
+button,input{font-family:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid #e7a06a;outline-offset:2px}
+
+.chrome{
+  height:52px;flex:none;display:flex;align-items:center;gap:16px;
+  padding:0 16px 0 18px;color:#f3efe6;background:#1a1613;
+  border-bottom:1px solid #3a322b;user-select:none;
+}
+.brand{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:#cfc6b8;white-space:nowrap}
+.brand b{color:#f3efe6;font-weight:600}
+.dots{display:flex;gap:5px;flex:1;justify-content:center;align-items:center}
+.dots button{
+  width:28px;height:8px;border:0;border-radius:99px;padding:0;
+  background:#4a4038;color:transparent;
+}
+.dots button.on{background:#e7a06a;width:44px}
+.dots button.done{background:#8d8376}
+.chrome-actions{display:flex;align-items:center;gap:8px}
+.chrome-actions button,.timer{
+  background:#2c261f;color:#f3efe6;border:1px solid #4a4038;border-radius:999px;
+  height:32px;padding:0 12px;font-size:13px;letter-spacing:.02em;
+}
+.timer{
+  font-family:Cousine,monospace;font-size:16px;min-width:92px;text-align:center;
+  font-variant-numeric:tabular-nums;
+}
+.timer.warn{color:#f0c27a;border-color:#a87830}
+.timer.late{color:#ffb4a2;border-color:#c45c46;background:#4a241c}
+.timer.over{color:#fff;background:#9a3418;border-color:#9a3418}
+.timer.pause{opacity:.55}
+body.clean-chrome .chrome-actions button,
+body.clean-chrome .brand{display:none}
+
+#stage{flex:1;position:relative;min-height:0}
+#deck{
+  position:absolute;width:1600px;height:900px;left:50%;top:50%;
+  margin:-450px 0 0 -800px;transform:scale(var(--fit));transform-origin:center center;
+  overflow:hidden;background:var(--paper);box-shadow:0 30px 80px rgba(0,0,0,.35);
+}
+.slide{
+  position:absolute;inset:0;display:flex;flex-direction:column;
+  padding:52px 78px 46px;opacity:0;pointer-events:none;overflow:hidden;
+  background:var(--paper);color:var(--ink);
+}
+.slide.is-on{opacity:1;pointer-events:auto;z-index:1}
+.slide .notes{display:none}
+.corners{
+  position:absolute;inset:16px;pointer-events:none;color:rgba(28,25,21,.4);
+  background:
+    linear-gradient(currentColor,currentColor) left 0 top 0 / 26px 1.5px no-repeat,
+    linear-gradient(currentColor,currentColor) left 0 top 0 / 1.5px 26px no-repeat,
+    linear-gradient(currentColor,currentColor) right 0 top 0 / 26px 1.5px no-repeat,
+    linear-gradient(currentColor,currentColor) right 0 top 0 / 1.5px 26px no-repeat,
+    linear-gradient(currentColor,currentColor) left 0 bottom 0 / 26px 1.5px no-repeat,
+    linear-gradient(currentColor,currentColor) left 0 bottom 0 / 1.5px 26px no-repeat,
+    linear-gradient(currentColor,currentColor) right 0 bottom 0 / 26px 1.5px no-repeat,
+    linear-gradient(currentColor,currentColor) right 0 bottom 0 / 1.5px 26px no-repeat;
+}
+.kicker{
+  font-size:15px;letter-spacing:.16em;text-transform:uppercase;color:var(--teal);
+  font-weight:600;margin:0 0 10px;
+}
+h1{
+  font-family:"EB Garamond",Georgia,serif;font-weight:400;font-size:64px;
+  line-height:.98;letter-spacing:-.02em;margin:0;color:var(--ink);
+}
+.lead{font-size:28px;line-height:1.35;color:var(--ink-soft);margin:0;max-width:46ch}
+.content{flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:22px;margin-top:8px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:stretch}
+.cols.g3{grid-template-columns:1fr 1fr 1fr}
+.card{
+  background:#fffdf8;border:1px solid var(--line);border-radius:18px;padding:22px 24px;
+}
+.card h2{margin:0 0 8px;font-size:15px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.card p{margin:0;font-size:24px;line-height:1.35}
+.spec{display:grid;grid-template-columns:148px 1fr;gap:7px 16px;margin:0;font-size:22px;line-height:1.25}
+.spec dt{color:var(--muted);font-weight:500}
+.spec dd{margin:0;font-variant-numeric:lining-nums tabular-nums}
+.formula{
+  font-family:"EB Garamond",serif;font-size:42px;text-align:center;
+  background:#fffdf8;border:1px solid var(--line);border-radius:18px;
+  padding:18px 20px 14px;letter-spacing:.01em;font-variant-numeric:lining-nums;
+}
+.formula .sub{font-family:Cabin,sans-serif;display:flex;justify-content:center;gap:28px;margin-top:8px;font-size:16px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.step h2{font-family:"EB Garamond",serif;font-size:32px;font-weight:400;margin:0 0 6px;letter-spacing:0;text-transform:none;color:var(--ink)}
+.step .n{font-family:Cousine,monospace;font-size:13px;color:var(--teal);letter-spacing:.14em}
+.step p{margin:0;font-size:20px;line-height:1.35;color:var(--ink-soft)}
+.same{display:grid;grid-template-columns:1fr auto 1fr;gap:18px;align-items:center}
+.same .eqcard{text-align:center;padding:26px 18px 22px}
+.same .eqcard .lbl{font-size:14px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.same .eqcard ul{list-style:none;margin:14px 0;padding:0;font-family:Cousine,monospace;font-size:26px;line-height:1.55}
+.same .eqcard .pix{font-family:"EB Garamond",serif;font-size:40px;color:var(--teal)}
+.arrow{font-size:28px;color:var(--muted);text-align:center}
+.banner{
+  border-radius:16px;padding:16px 22px;font-size:24px;line-height:1.35;
+}
+.banner strong{font-weight:650}
+.banner.warn{background:var(--copper-soft);color:#6d2e10;border:1px solid #efd2c2}
+.banner.ok{background:var(--teal-soft);color:#0d3f3b;border:1px solid #c9e3de}
+.banner em{font-style:normal;font-weight:650}
+table{width:100%;border-collapse:collapse;font-size:24px;font-variant-numeric:lining-nums tabular-nums}
+th{font-family:Cabin,sans-serif;font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600;text-align:right;padding:0 12px 8px;border-bottom:1px solid var(--line)}
+th:first-child,td:first-child{text-align:left}
+td{font-family:Cousine,monospace;text-align:right;padding:9px 12px;border-bottom:1px solid #eee6da}
+td.const{color:var(--teal);font-weight:700}
+td.move{color:var(--copper);font-weight:700}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.stat{background:#fffdf8;border:1px solid var(--line);border-radius:18px;padding:16px 18px 14px}
+.stat b{
+  display:block;font-family:"EB Garamond",serif;font-weight:400;font-size:48px;line-height:1;
+  font-variant-numeric:lining-nums tabular-nums;letter-spacing:-.02em;
+}
+.stat span{display:block;margin-top:6px;color:var(--muted);font-size:16px;line-height:1.3}
+.checks{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px}
+.checks div{display:flex;gap:12px;align-items:baseline;background:#fffdf8;border:1px solid var(--line);border-radius:14px;padding:12px 14px;font-size:20px;line-height:1.3}
+.checks .mark{font-family:Cousine,monospace;color:var(--teal);font-weight:700;flex:none}
+.bars{display:flex;flex-direction:column;gap:12px}
+.bar-row{display:grid;grid-template-columns:210px 1fr 280px;gap:14px;align-items:center;font-size:20px}
+.track{height:28px;background:#e7e0d4;border-radius:99px;overflow:hidden}
+.track i{display:block;height:100%;border-radius:99px}
+.track .yes{background:var(--teal);width:23%}
+.track .no{background:var(--copper);width:100%}
+.track .ind{background:#2f5d8a;width:25.4%}
+.bar-row .fig{font-family:Cousine,monospace;font-size:18px;text-align:right}
+.mini{display:grid;grid-template-columns:1.15fr .85fr;gap:22px;align-items:stretch;flex:1;min-height:0}
+.radial{width:100%;height:auto;display:block}
+.para b{font-family:"EB Garamond",serif;font-size:64px;font-weight:400;display:block;line-height:.9;font-variant-numeric:lining-nums}
+.para p{margin:8px 0 0;font-size:20px;line-height:1.35;color:var(--ink-soft)}
+.take{display:grid;grid-template-columns:72px 1fr;gap:8px 18px;align-items:start}
+.fig{margin:0;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;min-height:0;height:100%}
+.fig img{width:100%;flex:1;height:0;min-height:0;object-fit:contain;background:#fff;display:block}
+.fig figcaption{flex:none;font-size:16px;line-height:1.3;color:var(--ink-soft);padding:8px 12px 10px}
+.split{display:grid;grid-template-columns:1.2fr .9fr;gap:16px;min-height:0;flex:1;align-items:stretch}
+.pair,.pose{display:grid;gap:14px;min-height:0;flex:1;align-items:stretch}
+.pair{grid-template-columns:1fr 1fr}
+.pose{grid-template-columns:1.15fr .85fr}
+table.compact{font-size:20px}
+table.compact td{padding:7px 8px}
+table.compact th{padding-bottom:6px}
+.one-line{font-size:18px;line-height:1.35;color:var(--ink-soft);margin:0}
+.take .num{font-family:"EB Garamond",serif;font-size:54px;line-height:.8;color:var(--teal)}
+.take h2{margin:0 0 4px;font-size:28px;font-family:"EB Garamond",serif;font-weight:400}
+.take p{margin:0;font-size:22px;line-height:1.3;color:var(--ink-soft)}
+.ask{
+  font-family:"EB Garamond",serif;font-size:42px;font-style:italic;color:var(--teal);margin:0;
+}
+
+.slide.dark{background:#1c1915;color:#f4efe6}
+.slide.dark .corners{color:rgba(244,239,230,.4)}
+.slide.dark .kicker{color:#e7a06a}
+.slide.dark h1,.slide.dark .byline{color:#f4efe6}
+.slide.dark .byline{font-size:22px;margin:18px 0 0;color:#d9d0c3}
+.deck-plan{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:auto}
+.deck-plan div{border-top:1px solid rgba(244,239,230,.25);padding-top:12px}
+.deck-plan b{display:block;font-family:Cousine,monospace;font-size:14px;letter-spacing:.08em;color:#e7a06a;font-weight:400}
+.deck-plan strong{font-family:"EB Garamond",serif;font-weight:400;font-size:30px}
+.deck-plan span{display:block;color:#cfc6b8;font-size:16px;margin-top:2px}
+.rule{height:1px;background:rgba(244,239,230,.25);margin:22px 0}
+
+#notes{
+  flex:none;display:none;background:#14110e;color:#f4efe6;
+  border-top:3px solid #e7a06a;max-height:38vh;
+}
+body.show-notes #notes{display:flex;flex-direction:column}
+.notes-head{
+  display:flex;justify-content:space-between;gap:16px;align-items:baseline;
+  padding:10px 22px 0;color:#e7a06a;font-size:13px;letter-spacing:.12em;text-transform:uppercase;font-weight:600;
+}
+.notes-head .pace{color:#f4efe6;letter-spacing:0;text-transform:none;font-weight:500;font-size:15px}
+.notes-body{padding:6px 22px 14px;overflow:auto}
+.notes-body .say{font-size:22px;line-height:1.38;margin:0 0 8px}
+.notes-body .cut{margin:0;color:#cfc6b8;font-size:16px;line-height:1.35}
+.notes-body .cut b{color:#e7a06a;font-weight:600}
+.warn-strip{background:#9a4318;color:#fff;font-size:12px;letter-spacing:.14em;text-transform:uppercase;padding:4px 22px;font-weight:600}
+
+.overlay{
+  position:fixed;inset:0;background:rgba(20,16,12,.72);z-index:20;
+  display:none;align-items:flex-start;justify-content:center;padding:48px 24px;
+}
+.overlay.on{display:flex}
+.panel{
+  background:#f7f3eb;color:var(--ink);width:min(980px,100%);
+  max-height:calc(100vh - 96px);overflow:auto;border-radius:20px;padding:28px 32px 36px;
+  box-shadow:0 30px 80px rgba(0,0,0,.35);
+}
+.panel h2{font-family:"EB Garamond",serif;font-weight:400;font-size:40px;margin:0 0 8px}
+.panel .hint{color:var(--muted);margin:0 0 16px}
+.panel input{
+  width:100%;border:1px solid var(--line);background:#fff;border-radius:12px;
+  padding:12px 14px;font-size:18px;margin-bottom:14px;
+}
+.q{border-top:1px solid var(--line);padding:10px 0}
+.q button.qt{
+  width:100%;text-align:left;background:transparent;border:0;padding:6px 0;
+  font-size:18px;color:var(--ink);display:flex;gap:10px;align-items:baseline;
+}
+.q .tag{
+  font-family:Cousine,monospace;font-size:12px;letter-spacing:.08em;color:#fff;
+  background:var(--teal);border-radius:99px;padding:2px 8px;flex:none;
+}
+.q .tag.c{background:#2f5d8a}
+.q .tag.a{background:var(--copper)}
+.q .ans{display:none;padding:4px 0 8px 46px;font-size:17px;line-height:1.45;color:var(--ink-soft)}
+.q.open .ans{display:block}
+.keys{display:grid;grid-template-columns:120px 1fr;gap:6px 12px;font-size:18px}
+.keys kbd{font-family:Cousine,monospace;background:#fff;border:1px solid var(--line);border-radius:6px;padding:2px 6px}
+#overview .ov{display:flex;flex-direction:column;gap:6px}
+#overview .ov button{
+  text-align:left;background:#fffdf8;border:1px solid var(--line);border-radius:12px;
+  padding:10px 14px;font-size:18px;display:flex;gap:14px;
+}
+#overview .ov button.on{border-color:var(--teal);background:var(--teal-soft)}
+#overview .ov .n{font-family:Cousine,monospace;color:var(--teal);width:28px}
+#blank{
+  position:fixed;inset:0;background:#0e0c0a;z-index:30;display:none;
+  color:#f4efe6;align-items:flex-end;justify-content:flex-end;padding:28px;
+}
+#blank.on{display:flex}
+#blank .timer{background:transparent}
+@media (prefers-reduced-motion: reduce){
+  .slide{transition:none}
+}
+</style>
+</head>
+<body>
+<header class="chrome">
+  <div class="brand">Oral · <b>Calibrer une caméra</b></div>
+  <nav class="dots" id="dots" aria-label="Slides"></nav>
+  <div class="chrome-actions">
+    <button type="button" id="btn-prev" aria-label="Slide précédente">←</button>
+    <button type="button" id="btn-next" aria-label="Slide suivante">→</button>
+    <button type="button" id="timer" class="timer pause" title="Cliquer pour lancer ou suspendre. Maj+clic : remettre à 10:00">10:00</button>
+    <button type="button" id="btn-notes">Texte</button>
+    <button type="button" id="btn-q">Questions</button>
+    <button type="button" id="btn-help" aria-label="Aide">?</button>
+  </div>
+</header>
+
+<main id="stage">
+  <div id="deck">
+
+    <section class="slide dark is-on" data-who="A" data-title="Titre" data-start="0" data-end="25">
+      <div class="corners"></div>
+      <p class="kicker">Traitement des images · journée 1</p>
+      <h1>Calibrer une caméra</h1>
+      <p class="byline" id="byline">Du sténopé à la mesure en millimètres<br>ING3 HPDA · CY Tech Pau · chapitre 3</p>
+      <div class="rule"></div>
+      <div class="deck-plan">
+        <div><b>0:00 — 3:20</b><strong>Voix A</strong><span>Le modèle, et ce qu’une image ne dit pas</span></div>
+        <div><b>3:20 — 6:15</b><strong>Voix B</strong><span>Zhang, le piège du RMS, la focale retenue</span></div>
+        <div><b>6:15 — 10:00</b><strong>Voix C</strong><span>Homographie, erreur en mm, limites</span></div>
+      </div>
+      <aside class="notes">
+        <p class="say">Bonjour. Nous présentons la calibration de la journée 1 : passer d’une image à une mesure en millimètres, et dire de combien on se trompe. Trois temps : le modèle, la calibration, puis la mesure et ses limites.</p>
+        <p class="cut"><b>Si on est en retard.</b> Garder la dernière phrase et enchaîner.</p>
+      </aside>
+    </section>
+
+    <section class="slide" data-who="A" data-title="Le banc" data-start="25" data-end="80">
+      <div class="corners"></div>
+      <p class="kicker">Banc industriel · résolution de travail</p>
+      <h1>Un pixel n’a pas encore d’unité</h1>
+      <div class="content" style="justify-content:stretch">
+        <p class="one-line">D’abord <em>K</em> et la distorsion sur le damier, puis la pose sur la bâche, puis l’erreur sur des points qui n’ont pas servi au réglage.</p>
+        <div class="split">
+          <figure class="fig">
+            <img src="img/damiers.png" alt="Six vues du damier, à plat et inclinées, dans le champ">
+            <figcaption>Six des 29 vues. Damier déplacé dans tout le champ, à plat puis incliné. 29 détections sur 29.</figcaption>
+          </figure>
+          <div class="card">
+            <h2>Le banc</h2>
+            <dl class="spec">
+              <dt>Caméra</dt><dd>Basler acA5472-17uc · 5 472 × 3 648</dd>
+              <dt>Capteur</dt><dd>Sony IMX183 · photosite 2,4 µm</dd>
+              <dt>Objectif</dt><dd>Computar 8 mm</dd>
+              <dt>Travail</dt><dd>2 736 × 1 824 · pixel 4,80 µm</dd>
+              <dt>K théorique</dt><dd>f<sub>x</sub> = f<sub>y</sub> = 1 667 px · centre (1 368, 912)</dd>
+              <dt>Mire</dt><dd>29 vues · 8 × 6 coins · case 40 mm</dd>
+              <dt>Bâche</dt><dd>~1,25 m · 13 × 19 cercles · pas 100 mm</dd>
+              <dt>Contrôle</dt><dd>63 repères manuels · pas 200 mm</dd>
+            </dl>
+          </div>
+        </div>
+      </div>
+      <aside class="notes">
+        <p class="say">Tant que la caméra n’est pas calibrée, un pixel n’a pas de longueur dans la scène. Le banc est une Basler, capteur de 5 472 par 3 648, photosites de 2,4 micromètres, objectif de 8 millimètres. On travaille à 2 736 par 1 824 : le pixel utile fait 4,8 micromètres, et la focale théorique vaut 1 667 pixels. Sur la photo, six des 29 vues : le damier circule dans le champ, à plat puis incliné, et les 48 coins sont détectés à chaque fois. La bâche est à environ 1 mètre 25. Les 63 repères posés à la main ne servent pas à régler le modèle. Ils servent à le contrôler.</p>
+        <p class="cut"><b>Si on est en retard.</b> Caméra, 8 mm, 29 damiers, bâche à 1 mètre 25. Passer le détail du capteur.</p>
+      </aside>
+    </section>
+
+    <section class="slide" data-who="A" data-title="Le modèle" data-start="80" data-end="145">
+      <div class="corners"></div>
+      <p class="kicker">Modèle sténopé · quatre repères</p>
+      <h1>Trois étapes, une matrice</h1>
+      <div class="content">
+        <div class="formula">
+          s (u, v, 1)<sup>T</sup> = K [ R | t ] (X, Y, Z, 1)<sup>T</sup>
+          <div class="sub"><span>K · intrinsèques</span><span>R, t · pose</span><span>s = Z<sub>c</sub></span></div>
+        </div>
+        <div class="cols g3">
+          <div class="card step">
+            <div class="n">01 · EXTRINSÈQUES</div>
+            <h2>Monde → caméra</h2>
+            <p>Rotation R et translation t. Six paramètres. Ils changent dès que la caméra ou la mire bouge. OpenCV code R par un vecteur de Rodrigues.</p>
+          </div>
+          <div class="card step">
+            <div class="n">02 · PERSPECTIVE</div>
+            <h2>Diviser par Z<sub>c</sub></h2>
+            <p>x = X<sub>c</sub> / Z<sub>c</sub>. Seule étape non linéaire. Tout un rayon donne le même pixel : une image ne contient pas la profondeur.</p>
+          </div>
+          <div class="card step">
+            <div class="n">03 · INTRINSÈQUES</div>
+            <h2>Plan → pixels</h2>
+            <p>u = f<sub>x</sub> x + c<sub>x</sub>. La distorsion de Brown-Conrady s’insère juste avant, dans le plan normalisé. Neuf intrinsèques en tout.</p>
+          </div>
+        </div>
+      </div>
+      <aside class="notes">
+        <p class="say">Un point du monde devient un pixel en trois étapes. Les extrinsèques, rotation et translation : six nombres, ils changent dès que la caméra bouge. Ensuite la perspective, on divise par la profondeur. C’est la seule étape non linéaire. Un rayon entier s’écrase sur un seul pixel, donc une image ne contient pas la distance. Enfin la matrice K : focale en pixels et point principal. Elle ne dépend que de l’objectif et du capteur. La distorsion s’insère entre les deux, dans le plan normalisé. Sur l’exemple du notebook, le point 300 millimètres, moins 150, vu à 1 mètre 20, tombe au pixel 1 785, 704. Le calcul à la main et OpenCV donnent le même point.</p>
+        <p class="cut"><b>Si on est en retard.</b> Dire les trois étapes et le pixel 1 785, 704. La distorsion revient à la slide suivante.</p>
+      </aside>
+    </section>
+
+    <section class="slide" data-who="A" data-title="L’ambiguïté" data-start="145" data-end="200">
+      <div class="corners"></div>
+      <p class="kicker">Exercice 2 · le fil du TP</p>
+      <h1>Doubler f et Z ne change rien</h1>
+      <div class="content">
+        <p class="lead">Point P = (300, −150, 0) mm, caméra face à la scène.</p>
+        <div class="same">
+          <div class="card eqcard">
+            <div class="lbl">Réglage nominal</div>
+            <ul><li>f = 1 667 px</li><li>Z = 1 200 mm</li></ul>
+            <div class="pix">1 785 , 704</div>
+          </div>
+          <div class="arrow">même<br>pixel</div>
+          <div class="card eqcard">
+            <div class="lbl">Focale et distance doublées</div>
+            <ul><li>f = 3 333 px</li><li>Z = 2 400 mm</li></ul>
+            <div class="pix">1 785 , 704</div>
+          </div>
+        </div>
+        <div class="banner ok">Une mire plate, parallèle au capteur, ne contient que le rapport <em>f<sub>x</sub> / Z</em>. Le séparer est un problème mal posé.</div>
+      </div>
+      <aside class="notes">
+        <p class="say">Ce pixel va nous servir de test. On double la focale et on double la distance : il ne bouge pas. Toujours 1 785, 704. Une mire plate, parallèle au capteur, ne contient que le rapport de la focale à la distance. Les séparer est impossible. Ce n’est pas un défaut du logiciel, c’est le problème qui est mal posé. On va le mesurer sur les vraies images. Je te laisse la calibration.</p>
+        <p class="cut"><b>Relais vers B.</b> Si on est en retard : lire le bandeau et passer la parole.</p>
+      </aside>
+    </section>
+
+    <section class="slide" data-who="B" data-title="Le RMS ne suffit pas" data-start="200" data-end="285">
+      <div class="corners"></div>
+      <p class="kicker">Zhang · 13 vues à plat, moins de 5°</p>
+      <h1>0,17 px, et une focale qui glisse</h1>
+      <div class="content" style="justify-content:stretch">
+        <div class="split">
+          <figure class="fig">
+            <img src="img/inclinaison.png" alt="Inclinaison des 29 vues et couverture du champ">
+          </figure>
+          <table class="compact">
+            <thead>
+              <tr><th>Départ</th><th>f<sub>x</sub></th><th>Distance</th><th>f<sub>x</sub> / Z</th><th>RMS</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>6 mm</td><td class="move">977 px</td><td class="move">703 mm</td><td class="const">1,390</td><td class="const">0,171</td></tr>
+              <tr><td>8 mm</td><td class="move">1 125 px</td><td class="move">809 mm</td><td class="const">1,390</td><td class="const">0,171</td></tr>
+              <tr><td>10 mm</td><td class="move">1 214 px</td><td class="move">873 mm</td><td class="const">1,390</td><td class="const">0,171</td></tr>
+              <tr><td>12 mm</td><td class="move">1 268 px</td><td class="move">912 mm</td><td class="const">1,390</td><td class="const">0,171</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="banner warn"><strong>Difficulté.</strong> Sans a priori, autre point de la même vallée : f<sub>x</sub> = 20 690 px, distance 14,9 m, k<sub>3</sub> ≈ −133 000, et pourtant RMS = 0,19 px. L’incertitude affichée (±7 px) ne veut plus rien dire. Écart entre les quatre départs : 25 %.</div>
+      </div>
+      <aside class="notes">
+        <p class="say">Zhang minimise l’écart entre les coins détectés et les coins reprojetés. L’algorithme est local. Sur la figure, en rouge, les 13 vues à plat : le RMS est très bon, 0,17 pixel. La focale, elle, suit le point de départ : 977, 1 125, 1 214, 1 268 pixels. Vingt-cinq pour cent d’écart, RMS identique. Le rapport focale sur distance reste bloqué à 1,390. Sans a priori, autre point de la même vallée : 20 690 pixels, 14,9 mètres, un k₃ autour de moins 133 000, et un RMS de 0,19 pixel. L’incertitude affichée ne veut plus rien dire. Difficulté centrale : une erreur excellente peut décrire une caméra fausse.</p>
+        <p class="cut"><b>Si on est en retard.</b> Lire la ligne 8 mm et le cartel. Le rapport 1,390 est la phrase à ne pas couper.</p>
+      </aside>
+    </section>
+
+    <section class="slide" data-who="B" data-title="Calibration retenue" data-start="285" data-end="375">
+      <div class="corners"></div>
+      <p class="kicker">29/29 damiers · 16 vues inclinées, jusqu’à 38°</p>
+      <h1>L’inclinaison fixe la focale</h1>
+      <div class="content" style="justify-content:stretch">
+        <div class="stats">
+          <div class="stat"><b>8,41 mm</b><span>focale estimée<br>nominale 8,00 mm · +5,1 %</span></div>
+          <div class="stat"><b>0,188 px</b><span>RMS global<br>f<sub>x</sub> = 1 752 ± 2,3 px</span></div>
+          <div class="stat"><b>0,4 %</b><span>répétabilité<br>1 751 contre 1 759 px</span></div>
+          <div class="stat"><b>1 261 mm</b><span>damier posé à plat<br>bâche : 1 270 mm</span></div>
+        </div>
+        <div class="banner ok">Les vues à plat avaient fixé f<sub>x</sub> / Z = 1,390 px/mm. Les vues inclinées fixent f<sub>x</sub> = 1 752 px. La distance du plan suit : 1 752 / 1,390 ≈ 1 261 mm.</div>
+        <div class="pair">
+          <figure class="fig">
+            <img src="img/rms-vues.png" alt="Erreur de reprojection vue par vue, RMS global 0,188 px">
+          </figure>
+          <figure class="fig">
+            <img src="img/distorsion.png" alt="Carte de distorsion, jusqu'à 30 pixels dans les coins">
+          </figure>
+        </div>
+        <p class="one-line">Départ : écart 0 %. Écart-type 0,13 %. Répétabilité 0,4 %. Distorsion : jusqu’à 30 px dans les coins, et les vues inclinées ne sont pas pires que les vues à plat.</p>
+      </div>
+      <aside class="notes">
+        <p class="say">Dès que le damier est incliné, jusqu’à 38 degrés, les coins ne sont plus à la même profondeur. Les quatre départs donnent la même solution, à zéro pour cent près. 1 752 pixels, soit 8,41 millimètres. Deux moitiés indépendantes s’écartent de 0,4 pour cent : c’est l’incertitude qu’on retient. Sur la figure de gauche, l’erreur reste autour de 0,19 pixel, vues inclinées comprises. À droite, la distorsion déplace les coins de 30 pixels. Le rapport des vues à plat était 1,390. Divisé dans 1 752, il redonne 1 261 millimètres. Les 5 pour cent au-dessus du nominal ne viennent pas de la mise au point, qui n’explique que 0,6 pour cent. À toi la mesure.</p>
+        <p class="cut"><b>Garde-fou.</b> Les 1 211 mm du résumé OpenCV sont la moyenne de t<sub>z</sub> sur des damiers tenus en l’air. Le plan de travail, c’est 1 261 mm. <b>Relais vers C.</b></p>
+      </aside>
+    </section>
+
+    <section class="slide" data-who="C" data-title="Pose et homographie" data-start="375" data-end="440">
+      <div class="corners"></div>
+      <p class="kicker">PnP · 247 cercles · image déjà corrigée</p>
+      <h1>Du plan au pixel</h1>
+      <div class="content" style="justify-content:stretch">
+        <div class="pose">
+          <figure class="fig">
+            <img src="img/axes.png" alt="Repère de la bâche projeté sur la grille de cercles">
+            <figcaption>247 cercles. Repère : X rouge, Y vert, Z bleu, 400 mm. Caméra à 1 270 mm, inclinaison 0,11°.</figcaption>
+          </figure>
+          <div style="display:flex;flex-direction:column;gap:12px;min-height:0">
+            <figure class="fig" style="flex:1">
+              <img src="img/redresse.png" alt="Image corrigée et image redressée à 0,5 mm par pixel">
+              <figcaption>Redressement : 1 px = 0,5 mm. Déjà presque de face, l’échelle devient métrique.</figcaption>
+            </figure>
+            <div class="stats" style="grid-template-columns:1fr 1fr">
+              <div class="stat"><b>1 270 mm</b><span>distance · centre (900, 607)</span></div>
+              <div class="stat"><b>0,11°</b><span>inclinaison de la bâche</span></div>
+              <div class="stat"><b>0,93 px</b><span>reprojection · max 4,2 px</span></div>
+              <div class="stat"><b>0,46 px</b><span>écart H<sub>pose</sub> / H<sub>fit</sub></span></div>
+            </div>
+          </div>
+        </div>
+        <div class="banner ok">H = K [ r<sub>1</sub> r<sub>2</sub> t ], seulement pour Z = 0. 1,38 px/mm dans H, et f<sub>x</sub> / Z = 1 752 / 1 270 = 1,38.</div>
+      </div>
+      <aside class="notes">
+        <p class="say">K est connu. Une seule image de la bâche donne la pose : six inconnues, 247 cercles, image déjà corrigée. La caméra est à 1 270 millimètres, inclinée de 0,11 degré, au-dessus du centre de la grille. Presque de face : cette bâche, seule, n’aurait pas permis de calibrer K. D’où le damier incliné. Erreur moyenne 0,93 pixel, maximum 4,2. Tout est dans un plan, il reste une homographie. Depuis la pose ou par ajustement direct, l’écart est 0,46 pixel. Le facteur 1,38 pixel par millimètre, c’est la focale divisée par la distance. On peut redresser l’image à un demi-millimètre par pixel.</p>
+        <p class="cut"><b>Si on est en retard.</b> 1 270 mm, 0,11°, homographie à 0,46 px. Sauter le redressement.</p>
+      </aside>
+    </section>
+
+    <section class="slide" data-who="C" data-title="Erreur de mesure" data-start="440" data-end="505">
+      <div class="corners"></div>
+      <p class="kicker">Validation hors apprentissage</p>
+      <h1>L’erreur qui compte</h1>
+      <div class="content" style="justify-content:stretch">
+        <div class="pair">
+          <figure class="fig">
+            <img src="img/hist-erreur.png" alt="Histogramme de l'erreur avec et sans correction de distorsion">
+            <figcaption>Un cercle sur deux pour estimer H. Avec correction : moyenne 0,64 mm, RMS 0,70, max 1,57. Sans : 2,75 · 3,03 · 5,15. Facteur 4,3.</figcaption>
+          </figure>
+          <figure class="fig">
+            <img src="img/reperes.png" alt="Erreur sur les 63 repères posés à la main">
+            <figcaption>63 pastilles, autre grille. Moyenne 0,65 mm, RMS 0,77, max 2,31. Échelle −0,18 mm/m. Sur 1 800 mm : mesuré 1 796.</figcaption>
+          </figure>
+        </div>
+      </div>
+      <aside class="notes">
+        <p class="say">On ne juge pas l’erreur sur les points qui ont servi à l’ajustement. Un cercle sur deux estime l’homographie, les autres la testent. Avec la distorsion corrigée : 0,64 millimètre en moyenne, 0,70 en RMS. Sans correction : 2,75 et 3,03. Un peu plus de quatre fois moins précis. Ces cercles restent la même grille. On a repris 63 repères collés à la main, tous les 200 millimètres. On enlève seulement une rotation et une translation, pas l’échelle. Moyenne 0,65 millimètre, RMS 0,77, échelle juste à 0,18 millimètre près par mètre. Sur 1,80 mètre, la rangée du haut donne 1 796 millimètres : quatre millimètres, au bord.</p>
+        <p class="cut"><b>Si on est en retard.</b> RMS 0,70 contre 3,03, puis les repères à 0,77. Les 1 800 mm peuvent sauter.</p>
+      </aside>
+    </section>
+
+    <section class="slide" data-who="C" data-title="Limites" data-start="505" data-end="555">
+      <div class="corners"></div>
+      <p class="kicker">Ce que l’homographie n’explique pas</p>
+      <h1>Ensuite, c’est la scène</h1>
+      <div class="content" style="justify-content:stretch">
+        <div class="mini">
+          <figure class="fig">
+            <img src="img/radial.png" alt="Écart radial : nul sur les damiers, systématique sur la bâche">
+          </figure>
+          <div class="card para">
+            <h2>Hors du plan</h2>
+            <b>7,1 mm</b>
+            <p>Objet de 10 mm d’épaisseur à X = 900 mm, caméra à 1 270 mm. ΔX ≈ X h / Z. Dix fois le RMS de mesure. Un objectif télécentrique annule cet effet.</p>
+          </div>
+        </div>
+        <div class="banner warn"><strong>Difficulté.</strong> Damiers rigides : résidu radial nul, même dans les coins. Bâche : +0,7 px au centre, −1,9 px au bord. Même motif sur les repères. La toile se bombe. On ne calibre pas K dessus.</div>
+      </div>
+      <aside class="notes">
+        <p class="say">Le profil radial sépare les causes. Sur les damiers rigides, le résidu est nul, coins compris : le modèle d’objectif est bon. Sur la bâche, il est positif au centre et atteint moins 1,9 pixel au bord. Les repères dessinent la même courbe. La toile se bombe de quelques millimètres, et une homographie veut un plan parfait. C’est elle qui limite la mesure, autour du millimètre. On ne calibre donc pas les intrinsèques sur la bâche. Hors du plan, dix millimètres d’épaisseur à 900 millimètres de l’axe font 7,1 millimètres d’erreur, dix fois le RMS. Un objectif télécentrique annule cet effet.</p>
+        <p class="cut"><b>Si on est en retard.</b> Deux phrases : la bâche se bombe, 7 millimètres de parallaxe, télécentrique.</p>
+      </aside>
+    </section>
+
+    <section class="slide" data-who="C" data-title="À retenir" data-start="555" data-end="600">
+      <div class="corners"></div>
+      <p class="kicker">Ce qu’on emporte · Zhang, PAMI 2000</p>
+      <h1>Trois résultats</h1>
+      <div class="content" style="gap:16px">
+        <div class="take">
+          <div class="num">1</div>
+          <div>
+            <h2>Incliner, puis douter du départ</h2>
+            <p>RMS 0,19 px dans les deux cas. Écart de focale : 25 % à plat, 0 % avec les vues inclinées.</p>
+          </div>
+          <div class="num">2</div>
+          <div>
+            <h2>0,70 mm RMS, hors apprentissage</h2>
+            <p>Distorsion corrigée. Repères indépendants : 0,77 mm RMS, échelle à −0,18 mm/m.</p>
+          </div>
+          <div class="num">3</div>
+          <div>
+            <h2>Ensuite la scène domine</h2>
+            <p>Toile non plane, autour du millimètre. 10 mm d’épaisseur au bord : 7,1 mm. Objectif télécentrique.</p>
+          </div>
+        </div>
+        <p class="ask">Questions.</p>
+      </div>
+      <aside class="notes">
+        <p class="say">Trois résultats. D’abord, un RMS de deux dixièmes de pixel peut cacher une focale fausse : seules les vues inclinées la fixent. Ensuite, sept dixièmes de millimètre RMS hors des points de réglage, et une échelle juste à deux dixièmes de millimètre par mètre. Enfin, c’est la scène qui domine : la planéité de la bâche, puis l’épaisseur des objets. Nous prenons les questions.</p>
+        <p class="cut"><b>Questions.</b> Chacun répond sur sa partie. Touche Q sur l’ordinateur de préparation, pas à l’écran projeté.</p>
+      </aside>
+    </section>
+
+  </div>
+</main>
+
+<section id="notes" aria-live="polite">
+  <div class="warn-strip">Texte à dire — ne pas projeter</div>
+  <div class="notes-head">
+    <span id="notes-who">Voix A</span>
+    <span class="pace" id="notes-pace"></span>
+  </div>
+  <div class="notes-body" id="notes-body"></div>
+</section>
+
+<div class="overlay" id="q-overlay">
+  <div class="panel">
+    <h2>Questions probables</h2>
+    <p class="hint">Réservé à la préparation. Les chiffres sont ceux des cellules exécutées, pas ceux du bloc « Synthèse » en fin de notebook.</p>
+    <input id="q-filter" type="search" placeholder="Filtrer : focale, homographie, bâche…" spellcheck="false">
+    <div id="q-list"></div>
+  </div>
+</div>
+
+<div class="overlay" id="help">
+  <div class="panel">
+    <h2>Pendant l’oral</h2>
+    <p class="hint">Ouvrir ce fichier dans un navigateur. Aucune connexion. Le jour J : texte masqué, chrono lancé au premier avancement.</p>
+    <div class="keys">
+      <kbd>→</kbd><span>slide suivante (espace, page suivante)</span>
+      <kbd>←</kbd><span>slide précédente</span>
+      <kbd>T</kbd><span>lancer ou suspendre le chrono de 10:00</span>
+      <kbd>Maj+T</kbd><span>remettre le chrono à 10:00</span>
+      <kbd>N</kbd><span>afficher ou cacher le texte à dire</span>
+      <kbd>Q</kbd><span>questions probables</span>
+      <kbd>O</kbd><span>sommaire des slides</span>
+      <kbd>F</kbd><span>plein écran</span>
+      <kbd>B</kbd><span>écran noir, le chrono reste</span>
+      <kbd>C</kbd><span>masquer les boutons du bandeau</span>
+      <kbd>1–9, 0</kbd><span>sauter à une slide (0 = la dernière)</span>
+      <kbd>Échap</kbd><span>fermer un panneau</span>
+    </div>
+    <p class="hint" style="margin-top:18px">Noms sur la slide de titre : dans le script, constante <b>NOMS</b>.</p>
+  </div>
+</div>
+
+<div class="overlay" id="overview">
+  <div class="panel">
+    <h2>Slides</h2>
+    <div class="ov" id="ov-list"></div>
+  </div>
+</div>
+
+<div id="blank"><button type="button" id="blank-timer" class="timer">10:00</button></div>
+
+<script>
+const NOMS = "";
+
+const QUESTIONS = [
+  ["B","Pourquoi un RMS de 0,17 px ne valide pas les vues à plat ?",
+   "Le RMS dit que le modèle passe par les pixels. Ici plusieurs modèles le font aussi bien : de 977 à 1 268 px de focale, le RMS reste 0,171. Sans a priori on atteint même 20 690 px et 14,9 m, RMS 0,19. Toutes ces solutions gardent fₓ/Z ≈ 1,390. Une erreur faible est nécessaire. Elle ne dit pas que f et Z sont séparés."],
+  ["B","Que signifie le rapport 1,390 ?",
+   "Mire parallèle au capteur : u − cₓ = fₓ X / Z. Multiplier fₓ et Z par le même facteur ne change pas le pixel. C’est l’exercice 2, retrouvé sur les données : 1 785, 704 dans les deux cas. Les vues à plat mesurent ce rapport, rien d’autre."],
+  ["B","À quoi sert CALIB_USE_INTRINSIC_GUESS ?",
+   "« Pars de cette K », puis les images décident. Avec les vues inclinées, les départs 6, 8, 10 et 12 mm donnent la même focale : le guess ne fait qu’accélérer. À plat, même en partant de 8 mm, on finit à 1 125 px. Pour imposer la focale il faut CALIB_FIX_FOCAL_LENGTH : f fixée à 8 mm donne un RMS de 0,172 px et 1 199 mm, distance déduite de cette focale imposée."],
+  ["B","Pourquoi retenir 0,4 % plutôt que l’écart-type 0,13 % ?",
+   "calibrateCameraExtended suppose le modèle exact et des erreurs aléatoires. À plat, il annonçait ±0,5 px pendant que la focale bougeait de 25 %, et ±7 px sur les 20 690 px absurdes. La répétabilité coupe les 29 vues en deux moitiés intercalées, chacune avec des inclinées : 1 751 contre 1 759 px, soit 0,4 %. C’est l’incertitude pratique."],
+  ["B","8,41 mm au lieu de 8,00, est-ce une erreur ?",
+   "Non. Mise au point à 1,26 m : v = f Z / (Z − f) = 8,05 mm, soit +0,6 % seulement. Il reste environ +4,5 %, l’ordre d’une tolérance de fabrication. La répétabilité est 0,4 %, donc ±0,03 mm. L’écart à 8,05 mm vaut 0,36 mm, environ dix fois cette incertitude : c’est un biais, pas du bruit. Les deux moitiés donnent 8,40 et 8,44 mm."],
+  ["B","Pourquoi incliner, et pourquoi les coins ?",
+   "Inclinée, la mire a des coins à des profondeurs différentes. Le rétrécissement des cases lointaines sépare f et Z. Ici 16 vues jusqu’à 38°, plus 13 à plat. Les coins portent la distorsion, couplée à la focale : sans eux, k₁ est extrapolé et fₓ peut être biaisée. 29 détections sur 29, findChessboardCornersSB, repli cornerSubPix."],
+  ["A","Pourquoi réduire les images, et qu’est-ce que ça change à K ?",
+   "Les natives font 5 472 px de large. À 2 736, le photosite passe de 2,4 à 4,8 µm, donc fₓ = f / p est divisée par deux : 1 667 px théoriques. La géométrie en millimètres ne change pas. Les repères, pointés en pleine résolution, sont remis à l’échelle par 2 736 / 5 472."],
+  ["A","Où est la distorsion dans l’équation, et que vaut s ?",
+   "s vaut Zc : on divise les deux premières coordonnées homogènes par la troisième. La distorsion est entre la projection normalisée et le passage en pixels. Brown-Conrady : k₁, k₂, k₃ radiaux, p₁, p₂ tangentiels. Ici k₁ = −0,0925, barillet, attendu pour un 8 mm. p₁ et p₂ ≈ 0,0006. Neuf intrinsèques. La carte du notebook mesure jusqu’à 30 px de déplacement dans les coins."],
+  ["C","H pose et H fit diffèrent de 0,46 px. Laquelle utiliser ?",
+   "Pour Zw = 0, H = K [r₁ r₂ t]. H_pose vient du PnP. H_fit est estimée par findHomography sur les 247 cercles. 0,46 px d’écart : elles disent la même chose. On mesure avec l’inverse de H_fit. H a 8 degrés de liberté ; le surplus de points moyenne le bruit. Elle n’est valable que dans le plan."],
+  ["C","Pourquoi −4 mm sur 1 800 mm, alors que le RMS est 0,70 mm ?",
+   "0,70 mm est un hold-out local, un cercle sur deux. Les −3,98 mm relient deux cercles du bord de la première ligne, là où le bombement est maximal, et ces deux points ont servi à ajuster H dans la partie 7.2. Erreur systématique : elle ne se moyenne pas sur une grande base. −4 mm / 1 800 mm = 0,22 %. L’échelle globale, contrôlée par les repères, est à −0,18 mm/m. L’échelle est bonne. La surface ne l’est pas."],
+  ["C","Pourquoi un alignement rigide sur les repères ?",
+   "On ignore le décalage entre les pastilles et la grille des cercles. On retire une rotation et une translation, par SVD, et on ne retire pas d’échelle. Si le millimètre de l’homographie était faux, l’erreur exploserait. Elle reste à 0,65 mm en moyenne, rapport des tailles 0,99982."],
+  ["C","Comment voit-on que la bâche se bombe ?",
+   "Résidu radial : composante de (observé − prédit) le long du rayon issu du point principal. Damiers : 0,00, −0,005, 0,00, +0,004, −0,004 px. Bâche : +0,54, +0,74, +0,41, −0,59, −1,93 px. Les pastilles font le même dessin. Un objectif faux se verrait sur les damiers. Un défaut d’impression des cercles ne se verrait pas sur les pastilles. Reste la toile, bombée de quelques millimètres vers la caméra. Au bord, ~2 px à 1,38 px/mm font ~1,5 mm, l’ordre du max hold-out (1,57) et des pastilles (2,31)."],
+  ["C","D’où viennent les 7,1 mm, et que fait un télécentrique ?",
+   "Un objet d’épaisseur h est plus près. Par Thalès, ΔX ≈ X h / Z. X = 900 mm, h = 10 mm, Z = 1 270 mm : 7,1 mm, dix fois le RMS. Un objectif télécentrique rend les rayons principaux parallèles à l’axe : le grandissement ne dépend plus de Z, cette erreur tombe. Le champ est alors limité au diamètre de la lentille frontale. C’est le point du chapitre 1."],
+  ["B","Pourquoi ne pas estimer K sur la bâche ?",
+   "Deux raisons. Elle est à 0,11°, donc f et Z y sont dégénérés. Et elle n’est pas plane : son résidu radial serait absorbé par k₁ et biaiserait la focale. Intrinsèques sur le damier rigide, résidu radial nul. La bâche sert à la pose et à la mesure."],
+  ["B","1 211 mm ou 1 261 mm ?",
+   "summary affiche la moyenne de t_z sur les vues utilisées. Sur les 29 poses, 1 211 mm : les damiers inclinés sont tenus en l’air, à des distances variées. La distance au plan de travail est la médiane des seules vues à plat : 1 261 mm. Le PnP de la bâche donne 1 270 mm. Les 9 mm d’écart ont l’ordre de l’épaisseur de la mire posée sur la toile, et de la position du centre optique."],
+  ["C","Le PnP a un max de 4,2 px, la calibration 0,19. Est-ce un échec ?",
+   "Non. Le damier est rigide, coins au dixième de pixel. La bâche est souple : le plan ne peut pas tout absorber. 0,93 px en moyenne et 4,2 au max collent au résidu radial de ~2 px. On a passé une distorsion nulle à solvePnP parce que l’image était déjà corrigée. La remettre serait une double correction."],
+  ["A","Lire le centre optique (900, 607, −1 270).",
+   "t = (−902, −608, 1 268) mm est l’origine de la bâche vue depuis la caméra. C = −Rᵀ t est le centre optique dans le repère de la bâche. La grille va de 0 à 1 800 en X et de 0 à 1 200 en Y : la caméra est au-dessus du centre. R est presque l’identité, d’où 0,11°."],
+  ["B","La partie webcam ?",
+   "Optionnelle, non faite : aucune image. On aurait fixé k₃ = 0, pris 20 à 30 vues inclinées jusque dans les coins, sans focale de départ, et écarté les vues au-delà de 3 fois la médiane de l’erreur."],
+  ["B","Et si on ne peut pas incliner la mire ?",
+   "Fixer la focale nominale avec CALIB_FIX_FOCAL_LENGTH, et l’écrire : la distance obtenue en dépend. Sur nos vues à plat, f imposée à 8 mm donne RMS 0,172 px et 1 199 mm. Ce n’est plus une mesure indépendante de f."],
+  ["A","Le bloc Synthèse du notebook ne donne pas ces chiffres.",
+   "Il n’a pas été mis à jour après la dernière exécution. Il cite 0,190 px, un hold-out de 0,89 mm, des repères à 0,83 mm et −0,12 mm/m, une répétabilité de 0,5 %. Les sorties des cellules font foi : RMS 0,188 px, hold-out 0,64 / 0,70 / 1,57 mm, repères 0,65 / 0,77 / 2,31 mm, échelle −0,18 mm/m, répétabilité 0,4 %, parallaxe 7,1 mm. On présente celles-là."]
+];
+
+const slides = [...document.querySelectorAll(".slide")];
+const DURATION = 10 * 60 * 1000;
+let index = 0;
+let left = DURATION;
+let running = false;
+let lastTs = 0;
+let startedOnce = false;
+
+const timerEl = document.getElementById("timer");
+const blankTimer = document.getElementById("blank-timer");
+const notesWho = document.getElementById("notes-who");
+const notesPace = document.getElementById("notes-pace");
+const notesBody = document.getElementById("notes-body");
+const dots = document.getElementById("dots");
+
+if (NOMS) {
+  const b = document.getElementById("byline");
+  b.innerHTML = NOMS + "<br>" + b.innerHTML;
+}
+
+function fmt(ms) {
+  const sign = ms < 0 ? "+" : "";
+  const t = Math.abs(ms);
+  const s = Math.floor(t / 1000);
+  return sign + Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0");
+}
+function fmtClock(sec) {
+  sec = Math.max(0, Math.round(sec));
+  return Math.floor(sec / 60) + ":" + String(sec % 60).padStart(2, "0");
+}
+function renderTimer() {
+  const label = fmt(left);
+  for (const el of [timerEl, blankTimer]) {
+    el.textContent = label;
+    el.classList.toggle("pause", !running);
+    el.classList.toggle("warn", left < 120000 && left >= 30000);
+    el.classList.toggle("late", left < 30000 && left >= 0);
+    el.classList.toggle("over", left < 0);
+  }
+}
+function loop() {
+  if (!running) return;
+  const now = Date.now();
+  if (lastTs) left -= now - lastTs;
+  lastTs = now;
+  renderTimer();
+  if (document.body.classList.contains("show-notes")) renderNotes();
+}
+setInterval(loop, 200);
+
+function toggleTimer() { running = !running; if (running) lastTs = 0; renderTimer(); }
+function resetTimer() { running = false; left = DURATION; lastTs = 0; startedOnce = false; renderTimer(); }
+
+slides.forEach((s, i) => {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.title = s.dataset.title;
+  b.addEventListener("click", () => go(i));
+  dots.appendChild(b);
+});
+
+function show(i) {
+  index = Math.max(0, Math.min(slides.length - 1, i));
+  slides.forEach((s, k) => {
+    s.classList.toggle("is-on", k === index);
+    s.setAttribute("aria-hidden", k === index ? "false" : "true");
+  });
+  [...dots.children].forEach((d, k) => {
+    d.classList.toggle("on", k === index);
+    d.classList.toggle("done", k < index);
+  });
+  document.title = (index + 1) + " · " + slides[index].dataset.title;
+  renderNotes();
+  const ov = document.getElementById("ov-list");
+  if (ov.childElementCount) [...ov.children].forEach((b, k) => b.classList.toggle("on", k === index));
+}
+
+function go(i, opts) {
+  const nextIdx = Math.max(0, Math.min(slides.length - 1, i));
+  if (opts && opts.start && index === 0 && nextIdx > 0 && !startedOnce) {
+    startedOnce = true; running = true; lastTs = 0;
+  }
+  show(nextIdx);
+}
+function next() { go(index + 1, {start:true}); }
+function prev() { go(index - 1); }
+
+function renderNotes() {
+  const s = slides[index];
+  const who = {A:"Voix A · le modèle", B:"Voix B · la calibration", C:"Voix C · la mesure"}[s.dataset.who];
+  const nxt = slides[index + 1];
+  const relay = nxt && nxt.dataset.who !== s.dataset.who ? " · passe la parole à la fin" : "";
+  notesWho.textContent = who + relay;
+  const start = +s.dataset.start, end = +s.dataset.end;
+  let pace = "créneau " + fmtClock(start) + " → " + fmtClock(end);
+  if (running || left !== DURATION) {
+    const elapsed = (DURATION - left) / 1000;
+    if (elapsed < start) pace += " · " + Math.round(start - elapsed) + " s d’avance";
+    else if (elapsed > end) pace += " · " + Math.round(elapsed - end) + " s de retard";
+    else pace += " · dans le créneau, encore " + Math.round(end - elapsed) + " s";
+  }
+  notesPace.textContent = pace;
+  notesBody.innerHTML = s.querySelector(".notes").innerHTML;
+}
+
+function fit() {
+  const stage = document.getElementById("stage");
+  const sx = stage.clientWidth / 1600;
+  const sy = stage.clientHeight / 900;
+  document.documentElement.style.setProperty("--fit", Math.min(sx, sy));
+}
+new ResizeObserver(fit).observe(document.getElementById("stage"));
+fit();
+
+function overlay(id, force) {
+  const el = document.getElementById(id);
+  const on = force === undefined ? !el.classList.contains("on") : force;
+  document.querySelectorAll(".overlay").forEach(o => o.classList.remove("on"));
+  el.classList.toggle("on", on);
+}
+function closeOverlays() {
+  document.querySelectorAll(".overlay.on").forEach(o => o.classList.remove("on"));
+}
+
+document.getElementById("btn-next").addEventListener("click", next);
+document.getElementById("btn-prev").addEventListener("click", prev);
+timerEl.addEventListener("click", (e) => { if (e.shiftKey) resetTimer(); else toggleTimer(); });
+document.getElementById("btn-notes").addEventListener("click", () => {
+  document.body.classList.toggle("show-notes");
+  renderNotes();
+  requestAnimationFrame(fit);
+});
+document.getElementById("btn-q").addEventListener("click", () => overlay("q-overlay"));
+document.getElementById("btn-help").addEventListener("click", () => overlay("help"));
+
+const qList = document.getElementById("q-list");
+QUESTIONS.forEach(([who, q, a]) => {
+  const d = document.createElement("div");
+  d.className = "q";
+  d.dataset.fold = (q + " " + a).toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  d.innerHTML = '<button type="button" class="qt"><span class="tag ' + who.toLowerCase() + '">' + who + '</span><span>' + q + '</span></button><div class="ans"></div>';
+  d.querySelector(".ans").textContent = a;
+  d.querySelector(".qt").addEventListener("click", () => d.classList.toggle("open"));
+  qList.appendChild(d);
+});
+document.getElementById("q-filter").addEventListener("input", (e) => {
+  const f = e.target.value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  qList.querySelectorAll(".q").forEach(d => { d.style.display = d.dataset.fold.includes(f) ? "" : "none"; });
+});
+
+const ov = document.getElementById("ov-list");
+slides.forEach((s, i) => {
+  const b = document.createElement("button");
+  b.type = "button";
+  b.innerHTML = '<span class="n">' + String(i + 1).padStart(2, "0") + '</span><span>' + s.dataset.title + '</span>';
+  b.addEventListener("click", () => { go(i); overlay("overview", false); });
+  ov.appendChild(b);
+});
+
+document.querySelectorAll(".overlay").forEach(o => {
+  o.addEventListener("click", (e) => { if (e.target === o) o.classList.remove("on"); });
+});
+
+function typing(e) {
+  const t = e.target;
+  return t && (t.tagName === "INPUT" || t.tagName === "TEXTAREA");
+}
+document.addEventListener("keydown", (e) => {
+  if (typing(e)) {
+    if (e.key === "Escape") e.target.blur();
+    return;
+  }
+  const k = e.key;
+  if (k === "Escape") {
+    if (document.getElementById("blank").classList.contains("on")) {
+      document.getElementById("blank").classList.remove("on");
+      return;
+    }
+    closeOverlays();
+    return;
+  }
+  if (k === "ArrowRight" || k === "PageDown" || k === " ") { e.preventDefault(); next(); }
+  else if (k === "ArrowLeft" || k === "PageUp" || k === "Backspace") { e.preventDefault(); prev(); }
+  else if (k === "Home") go(0);
+  else if (k === "End") go(slides.length - 1);
+  else if (k === "t" || k === "T") { if (e.shiftKey) resetTimer(); else toggleTimer(); }
+  else if (k === "n" || k === "N") { document.body.classList.toggle("show-notes"); renderNotes(); requestAnimationFrame(fit); }
+  else if (k === "q" || k === "Q") overlay("q-overlay");
+  else if (k === "o" || k === "O") overlay("overview");
+  else if (k === "?" || (k === "/" && e.shiftKey)) overlay("help");
+  else if (k === "f" || k === "F") {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+    else document.exitFullscreen?.();
+  }
+  else if (k === "b" || k === "B") document.getElementById("blank").classList.toggle("on");
+  else if (k === "c" || k === "C") document.body.classList.toggle("clean-chrome");
+  else if (k >= "1" && k <= "9") go(+k - 1);
+  else if (k === "0") go(slides.length - 1);
+});
+
+let touchX = null;
+document.getElementById("stage").addEventListener("touchstart", (e) => { touchX = e.changedTouches[0].clientX; }, {passive:true});
+document.getElementById("stage").addEventListener("touchend", (e) => {
+  if (touchX == null) return;
+  const dx = e.changedTouches[0].clientX - touchX;
+  if (dx < -60) next();
+  else if (dx > 60) prev();
+  touchX = null;
+}, {passive:true});
+
+show(0);
+renderTimer();
+</script>
+</body>
+</html>
